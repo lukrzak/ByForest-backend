@@ -1,9 +1,8 @@
-package com.lukrzak.ByForest.event.controller.impl;
+package com.lukrzak.ByForest.event.controller;
 
-import com.lukrzak.ByForest.event.controller.api.EventController;
 import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.model.Event;
-import com.lukrzak.ByForest.event.service.api.EventService;
+import com.lukrzak.ByForest.event.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

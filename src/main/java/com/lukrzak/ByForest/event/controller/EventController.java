@@ -1,14 +1,14 @@
-package com.lukrzak.ByForest.event.service.api;
+package com.lukrzak.ByForest.event.controller;
 
 import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.model.Event;
 
-public interface EventService {
+public interface EventController {
 
-	Event findEvent(Long id);
+	Event findEvent(long id);
 
 	void saveEvent(PostEventRequest postEventRequest);
 
-	void deleteEvent(Long id);
+	void deleteEvent(long id);
 
 }
