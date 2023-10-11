@@ -1,29 +1,53 @@
 package com.lukrzak.ByForest.user.service;
 
+import com.lukrzak.ByForest.user.dto.GetUserResponse;
+import com.lukrzak.ByForest.user.dto.PostUserRequest;
+import com.lukrzak.ByForest.user.exception.CredentialsAlreadyTakenException;
+import com.lukrzak.ByForest.user.mapper.UserMapper;
 import com.lukrzak.ByForest.user.model.User;
 import com.lukrzak.ByForest.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DefaultUserService implements UserService {
 
 	private final UserRepository userRepository;
 
 	@Override
-	public User findUser(long id) {
-		return null;
+	public GetUserResponse findUser(long id) {
+		User foundUser = userRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException("User with id: " + id + " does not exist"));
+		log.info("User with id: {} has been found: {}-{}", id, foundUser.getLogin(), foundUser.getEmail());
+		return UserMapper.MAPPER.userToGetUserResponse(foundUser);
 	}
 
 	@Override
-	public void saveUser(User user) {
-
+	public void saveUser(PostUserRequest user) throws CredentialsAlreadyTakenException {
+		checkIfLoginOrEmailTaken(user);
+		User userToSave = UserMapper.MAPPER.postUserRequestToUser(user);
+		log.info("New user entity has been created - id: {}, login: {}, email: {}",
+				userToSave.getId(), userToSave.getLogin(), userToSave.getEmail());
+		userRepository.save(userToSave);
+		log.info("User has been saved to database");
 	}
 
 	@Override
 	public void deleteUser(long id) {
+		userRepository.deleteById(id);
+		log.info("User with id: {} has been deleted", id);
+	}
 
+	private void checkIfLoginOrEmailTaken(PostUserRequest userRequest) throws CredentialsAlreadyTakenException {
+		Optional<User> user = userRepository.findByLoginOrEmail(userRequest.getLogin(), userRequest.getEmail());
+		if (user.isPresent()) throw new CredentialsAlreadyTakenException("User's login or email already taken");
+		log.info("login: {} and email: {} are not taken", userRequest.getLogin(), userRequest.getPassword());
 	}
 
 }
