@@ -11,6 +11,8 @@ services:
       MYSQL_DATABASE: $MYSQLDB_DATABASE
     ports:
       - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
     networks:
       forest-net:
 
@@ -29,3 +31,6 @@ services:
 
 networks:
   forest-net:
+
+volumes:
+  db_data:
