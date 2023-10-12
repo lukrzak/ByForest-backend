@@ -3,16 +3,22 @@ package com.lukrzak.ByForest.user.mapper;
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.user.model.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
 public interface UserMapper {
 
-	UserMapper MAPPER = Mappers.getMapper(UserMapper.class);
+	static GetUserResponse mapToGetUserResponse(User user) {
+		return GetUserResponse.builder()
+				.login(user.getLogin())
+				.email(user.getEmail())
+				.build();
+	}
 
-	GetUserResponse userToGetUserResponse(User user);
-
-	User postUserRequestToUser(PostUserRequest postUserRequest);
+	static User mapToUser(PostUserRequest postUserRequest) {
+		return User.builder()
+				.email(postUserRequest.getEmail())
+				.login(postUserRequest.getLogin())
+				.password(postUserRequest.getPassword())
+				.build();
+	}
 
 }
