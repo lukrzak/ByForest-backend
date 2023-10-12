@@ -3,10 +3,10 @@ package com.lukrzak.ByForest.user.service;
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.user.exception.CredentialsAlreadyTakenException;
+import com.lukrzak.ByForest.user.exception.UserDoesntExistException;
 import com.lukrzak.ByForest.user.mapper.UserMapper;
 import com.lukrzak.ByForest.user.model.User;
 import com.lukrzak.ByForest.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,17 +21,17 @@ public class DefaultUserService implements UserService {
 	private final UserRepository userRepository;
 
 	@Override
-	public GetUserResponse findUser(long id) {
+	public GetUserResponse findUser(long id) throws UserDoesntExistException {
 		User foundUser = userRepository.findById(id)
-				.orElseThrow(() -> new EntityNotFoundException("User with id: " + id + " does not exist"));
+				.orElseThrow(() -> new UserDoesntExistException("User with id: " + id + " does not exist"));
 		log.info("User with id: {} has been found: {}-{}", id, foundUser.getLogin(), foundUser.getEmail());
-		return UserMapper.MAPPER.userToGetUserResponse(foundUser);
+		return UserMapper.mapToGetUserResponse(foundUser);
 	}
 
 	@Override
 	public void saveUser(PostUserRequest user) throws CredentialsAlreadyTakenException {
 		checkIfLoginOrEmailTaken(user);
-		User userToSave = UserMapper.MAPPER.postUserRequestToUser(user);
+		User userToSave = UserMapper.mapToUser(user);
 		log.info("New user entity has been created - id: {}, login: {}, email: {}",
 				userToSave.getId(), userToSave.getLogin(), userToSave.getEmail());
 		userRepository.save(userToSave);
