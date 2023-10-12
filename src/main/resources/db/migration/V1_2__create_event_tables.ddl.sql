@@ -1,5 +1,5 @@
 CREATE TABLE events (
-    id INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     date DATE NOT NULL,
     place VARCHAR(255) NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE events (
 );
 
 CREATE TABLE events_responses (
-    id INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     event_id INT NOT NULL,
     user_id INT NOT NULL,
     status VARCHAR(11),
