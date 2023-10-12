@@ -11,4 +11,8 @@ public class PostUserRequest {
 	private String password;
 	private String email;
 
+	@Override
+	public String toString(){
+		return login + ", " + email;
+	}
 }

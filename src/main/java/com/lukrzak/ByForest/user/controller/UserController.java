@@ -1,13 +1,15 @@
 package com.lukrzak.ByForest.user.controller;
 
-import com.lukrzak.ByForest.user.model.User;
+import com.lukrzak.ByForest.user.dto.GetUserResponse;
+import com.lukrzak.ByForest.user.dto.PostUserRequest;
+import org.springframework.http.ResponseEntity;
 
 public interface UserController {
 
-	User findUser(long id);
+	ResponseEntity<GetUserResponse> findUser(long id);
 
-	void saveUser(User user);
+	ResponseEntity<String> saveUser(PostUserRequest userRequest);
 
-	void deleteUser(long id);
+	ResponseEntity<String> deleteUser(long id);
 
 }
