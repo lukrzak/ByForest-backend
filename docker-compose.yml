@@ -3,7 +3,7 @@ version: "3.8"
 services:
   forest-db:
     container_name: forest-db
-    image: mysql
+    image: mysql:8.1.0
     env_file:
       - ./.env
     environment:
