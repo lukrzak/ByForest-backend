@@ -2,8 +2,8 @@ package com.lukrzak.ByForest.user.service;
 
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
-import com.lukrzak.ByForest.user.exception.CredentialsAlreadyTakenException;
-import com.lukrzak.ByForest.user.exception.UserDoesntExistException;
+import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
+import com.lukrzak.ByForest.exception.UserDoesntExistException;
 import com.lukrzak.ByForest.user.mapper.UserMapper;
 import com.lukrzak.ByForest.user.model.User;
 import com.lukrzak.ByForest.user.repository.UserRepository;
@@ -46,7 +46,10 @@ public class DefaultUserService implements UserService {
 
 	private void checkIfLoginOrEmailTaken(PostUserRequest userRequest) throws CredentialsAlreadyTakenException {
 		Optional<User> user = userRepository.findByLoginOrEmail(userRequest.getLogin(), userRequest.getEmail());
-		if (user.isPresent()) throw new CredentialsAlreadyTakenException("User's login or email already taken");
+		if (user.isPresent()){
+			String message = String.format("User with login: %s or email: %s already exists", userRequest.getLogin(), userRequest.getEmail());
+			throw new CredentialsAlreadyTakenException(message);
+		}
 		log.info("login: {} and email: {} are not taken", userRequest.getLogin(), userRequest.getPassword());
 	}
 

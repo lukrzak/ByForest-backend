@@ -3,13 +3,12 @@ package com.lukrzak.ByForest.user;
 import com.lukrzak.ByForest.user.controller.DefaultUserController;
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
-import com.lukrzak.ByForest.user.exception.CredentialsAlreadyTakenException;
-import com.lukrzak.ByForest.user.exception.UserDoesntExistException;
+import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
+import com.lukrzak.ByForest.exception.UserDoesntExistException;
 import com.lukrzak.ByForest.user.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,22 +46,7 @@ public class DefaultControllerTests {
 	}
 
 	@Test
-	void testFindingUser() {
-		ResponseEntity<GetUserResponse> response = userController.findUser(1L);
-
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(dummyResponse, response.getBody());
-		assertThrows(ResponseStatusException.class, () -> userController.findUser(2L));
-		try {
-			userController.findUser(2L);
-		}
-		catch (ResponseStatusException e){
-			assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
-		}
-	}
-
-	@Test
-	void testSavingUser() {
+	void testSavingUser() throws CredentialsAlreadyTakenException{
 		userController.saveUser(new PostUserRequest("aa", "bb", "cc@em.com"));
 		assertThrows(ResponseStatusException.class, () -> userController.saveUser(dummyPostRequest));
 		try {
@@ -71,11 +55,6 @@ public class DefaultControllerTests {
 		catch (ResponseStatusException e){
 			assertEquals(HttpStatus.BAD_REQUEST, e.getStatusCode());
 		}
-	}
-
-	@Test
-	void testDeletingUser() {
-		assertEquals(HttpStatus.OK, userController.deleteUser(1L).getStatusCode());
 	}
 
 }

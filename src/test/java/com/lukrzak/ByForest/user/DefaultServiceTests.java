@@ -2,8 +2,8 @@ package com.lukrzak.ByForest.user;
 
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
-import com.lukrzak.ByForest.user.exception.CredentialsAlreadyTakenException;
-import com.lukrzak.ByForest.user.exception.UserDoesntExistException;
+import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
+import com.lukrzak.ByForest.exception.UserDoesntExistException;
 import com.lukrzak.ByForest.user.model.User;
 import com.lukrzak.ByForest.user.repository.UserRepository;
 import com.lukrzak.ByForest.user.service.DefaultUserService;
