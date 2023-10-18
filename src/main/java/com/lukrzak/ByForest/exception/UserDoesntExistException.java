@@ -1,4 +1,4 @@
-package com.lukrzak.ByForest.user.exception;
+package com.lukrzak.ByForest.exception;
 
 public class UserDoesntExistException extends Exception {
 
