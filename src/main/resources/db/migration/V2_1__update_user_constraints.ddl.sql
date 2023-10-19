@@ -1,0 +1,6 @@
+ALTER TABLE users
+MODIFY login VARCHAR(20) NOT NULL UNIQUE CHECK (length(login) >= 3);
+
+ALTER TABLE users
+MODIFY email VARCHAR(255) NOT NULL UNIQUE CHECK (length(email) >= 5);
+
