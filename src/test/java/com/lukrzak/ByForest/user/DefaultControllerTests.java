@@ -23,8 +23,8 @@ import static org.mockito.Mockito.when;
 public class DefaultControllerTests {
 
 	private static DefaultUserController userController;
-	private static GetUserResponse dummyResponse = new GetUserResponse("login", "email@em.com");
-	private static PostUserRequest dummyPostRequest = new PostUserRequest("login", "pass", "email@em.com");
+	private static final GetUserResponse dummyResponse = new GetUserResponse("login", "email@em.com");
+	private static final PostUserRequest dummyPostRequest = new PostUserRequest("login", "pass", "email@em.com");
 
 	@BeforeAll
 	static void setup() throws UserDoesntExistException, CredentialsAlreadyTakenException, ViolatedConstraintException {
