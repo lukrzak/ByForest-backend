@@ -22,13 +22,17 @@ public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	private String login;
+
 	@Setter
 	private String password;
+
 	private String email;
 
 	@Override
 	public String toString() {
 		return String.format("User[%s, %s, %s]", id, login, email);
 	}
+
 }
