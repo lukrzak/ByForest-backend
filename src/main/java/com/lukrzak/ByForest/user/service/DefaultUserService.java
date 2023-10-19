@@ -1,6 +1,7 @@
 package com.lukrzak.ByForest.user.service;
 
 import com.lukrzak.ByForest.exception.ViolatedConstraintException;
+import com.lukrzak.ByForest.user.dto.AuthenticationRequest;
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
@@ -8,6 +9,7 @@ import com.lukrzak.ByForest.exception.UserDoesntExistException;
 import com.lukrzak.ByForest.user.mapper.UserMapper;
 import com.lukrzak.ByForest.user.model.User;
 import com.lukrzak.ByForest.user.repository.UserRepository;
+import com.lukrzak.ByForest.util.JwtGenerator;
 import com.lukrzak.ByForest.util.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,14 +25,7 @@ public class DefaultUserService implements UserService {
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder encoder;
-
-	@Override
-	public GetUserResponse findUser(long id) throws UserDoesntExistException {
-		User foundUser = userRepository.findById(id)
-				.orElseThrow(() -> new UserDoesntExistException("User with id: " + id + " does not exist"));
-		log.info("User with id: {} has been found: {}-{}", id, foundUser.getLogin(), foundUser.getEmail());
-		return UserMapper.mapToGetUserResponse(foundUser);
-	}
+	private final JwtGenerator jwtGenerator;
 
 	@Override
 	public User saveUser(PostUserRequest user) throws CredentialsAlreadyTakenException, ViolatedConstraintException {
@@ -41,6 +36,24 @@ public class DefaultUserService implements UserService {
 		log.info("{} has been saved to the database", user);
 
 		return userToSave;
+	}
+
+	@Override
+	public String authenticateUser(AuthenticationRequest authenticationRequest) throws UserDoesntExistException {
+		User user = userRepository.findByEmail(authenticationRequest.getEmail())
+				.orElseThrow(() -> new UserDoesntExistException("User does not exist"));
+		if (!encoder.matches(authenticationRequest.getPassword(), user.getPassword()))
+			throw new UserDoesntExistException("Incorrect password");
+
+		return jwtGenerator.generateJwtToken(user.getEmail());
+	}
+
+	@Override
+	public GetUserResponse findUser(long id) throws UserDoesntExistException {
+		User foundUser = userRepository.findById(id)
+				.orElseThrow(() -> new UserDoesntExistException("User with id: " + id + " does not exist"));
+		log.info("User with id: {} has been found: {}-{}", id, foundUser.getLogin(), foundUser.getEmail());
+		return UserMapper.mapToGetUserResponse(foundUser);
 	}
 
 	@Override

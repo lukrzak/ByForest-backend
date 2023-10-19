@@ -8,6 +8,7 @@ import com.lukrzak.ByForest.exception.UserDoesntExistException;
 import com.lukrzak.ByForest.user.model.User;
 import com.lukrzak.ByForest.user.repository.UserRepository;
 import com.lukrzak.ByForest.user.service.DefaultUserService;
+import com.lukrzak.ByForest.util.JwtGenerator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,7 +37,8 @@ public class DefaultServiceTests {
 	static void setup() {
 		UserRepository userRepository = mock(UserRepository.class);
 		PasswordEncoder encoder = mock(BCryptPasswordEncoder.class);
-		userService = new DefaultUserService(userRepository, encoder);
+		JwtGenerator generator = spy(JwtGenerator.class);
+		userService = new DefaultUserService(userRepository, encoder, generator);
 
 		when(userRepository.findById(anyLong()))
 				.thenAnswer(inv -> {
