@@ -7,7 +7,6 @@ import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
 import com.lukrzak.ByForest.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,14 +26,13 @@ public class DefaultUserController implements UserController {
 	@PostMapping
 	public ResponseEntity<String> saveUser(@RequestBody PostUserRequest userRequest) throws CredentialsAlreadyTakenException, ViolatedConstraintException {
 		userService.saveUser(userRequest);
-		return new ResponseEntity<>("User " + userRequest + " saved successfully", HttpStatus.OK);
+		return ResponseEntity.ok().body("User " + userRequest + " saved successfully");
 	}
 
 	@Override
 	@PostMapping("/authenticate")
 	public ResponseEntity<String> authenticateUser(@RequestBody AuthenticationRequest authenticationRequest) throws UserDoesntExistException {
-		return new ResponseEntity<>(userService.authenticateUser(authenticationRequest), HttpStatus.OK);
-		//return ResponseEntity.ok().body(userService.authenticateUser(authenticationRequest));
+		return ResponseEntity.ok().body(userService.authenticateUser(authenticationRequest));
 	}
 
 }
