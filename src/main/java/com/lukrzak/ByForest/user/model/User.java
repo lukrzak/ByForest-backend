@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "users")
@@ -22,7 +23,12 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String login;
+	@Setter
 	private String password;
 	private String email;
 
+	@Override
+	public String toString() {
+		return String.format("User[%s, %s, %s]", id, login, email);
+	}
 }
