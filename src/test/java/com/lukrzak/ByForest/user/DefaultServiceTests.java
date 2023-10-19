@@ -11,10 +11,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -30,7 +33,8 @@ public class DefaultServiceTests {
 	@BeforeAll
 	static void setup() {
 		UserRepository userRepository = mock(UserRepository.class);
-		userService = new DefaultUserService(userRepository);
+		PasswordEncoder encoder = mock(BCryptPasswordEncoder.class);
+		userService = new DefaultUserService(userRepository, encoder);
 
 		when(userRepository.findById(anyLong()))
 				.thenAnswer(inv -> {
@@ -67,6 +71,14 @@ public class DefaultServiceTests {
 		userService.saveUser(req);
 
 		assertThrows(CredentialsAlreadyTakenException.class, () -> userService.saveUser(postWithTakenCredentials));
+	}
+
+	@Test
+	void testPasswordEncryptingOnUserCreation() throws CredentialsAlreadyTakenException {
+		PostUserRequest req = new PostUserRequest("new", "pass", "emmm@em.com");
+
+		User savedUser = userService.saveUser(req);
+		assertNotEquals(req.getPassword(), savedUser.getPassword());
 	}
 
 	@Test

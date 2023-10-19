@@ -48,8 +48,8 @@ public class UserApiTests {
 		PostUserRequest userRequest = new PostUserRequest("login", "Password123!", "email@em.com");
 		PostUserRequest otherUser = new PostUserRequest("lloogg", "Password123!", "emaaaa@em.com");
 
-		assertEquals("User " + userRequest + " saved successfully", getPostUserResponse(userRequest));
-		assertEquals("User " + otherUser + " saved successfully", getPostUserResponse(otherUser));
+		assertEquals("User " + userRequest + " saved successfully", getSaveUserResponse(userRequest));
+		assertEquals("User " + otherUser + " saved successfully", getSaveUserResponse(otherUser));
 		assertEquals(2, userRepository.findAll().size());
 	}
 
@@ -58,10 +58,10 @@ public class UserApiTests {
 		PostUserRequest userRequest = new PostUserRequest("login", "pass", "email@em.com");
 		PostUserRequest userWithTakenCredentials = new PostUserRequest("login", "ppp", "emaaaa@em.com");
 
-		assertEquals("User " + userRequest + " saved successfully", getPostUserResponse(userRequest));
+		assertEquals("User " + userRequest + " saved successfully", getSaveUserResponse(userRequest));
 		assertEquals("User with login: " + userWithTakenCredentials.getLogin()
 				+ " or email: " + userWithTakenCredentials.getEmail()
-				+ " already exists", getPostUserResponse(userWithTakenCredentials));
+				+ " already exists", getSaveUserResponse(userWithTakenCredentials));
 		assertEquals(1, userRepository.findAll().size());
 	}
 
@@ -75,7 +75,7 @@ public class UserApiTests {
 		// TODO
 	}
 
-	private String getPostUserResponse(PostUserRequest userRequest){
+	private String getSaveUserResponse(PostUserRequest userRequest) {
 		return webTestClient.post()
 				.uri(URI)
 				.bodyValue(userRequest)

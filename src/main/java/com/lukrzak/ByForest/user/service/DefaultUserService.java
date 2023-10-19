@@ -9,6 +9,7 @@ import com.lukrzak.ByForest.user.model.User;
 import com.lukrzak.ByForest.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class DefaultUserService implements UserService {
 
 	private final UserRepository userRepository;
+	private final PasswordEncoder encoder;
 
 	@Override
 	public GetUserResponse findUser(long id) throws UserDoesntExistException {
@@ -29,13 +31,13 @@ public class DefaultUserService implements UserService {
 	}
 
 	@Override
-	public void saveUser(PostUserRequest user) throws CredentialsAlreadyTakenException {
+	public User saveUser(PostUserRequest user) throws CredentialsAlreadyTakenException {
 		checkIfLoginOrEmailTaken(user);
-		User userToSave = UserMapper.mapToUser(user);
-		log.info("New user entity has been created - id: {}, login: {}, email: {}",
-				userToSave.getId(), userToSave.getLogin(), userToSave.getEmail());
+		User userToSave = createUserEntityFromDto(user);
 		userRepository.save(userToSave);
-		log.info("User has been saved to database");
+		log.info("{} has been saved to the database", user);
+
+		return userToSave;
 	}
 
 	@Override
@@ -51,6 +53,16 @@ public class DefaultUserService implements UserService {
 			throw new CredentialsAlreadyTakenException(message);
 		}
 		log.info("login: {} and email: {} are not taken", userRequest.getLogin(), userRequest.getPassword());
+	}
+
+	private User createUserEntityFromDto(PostUserRequest postUserRequest) {
+		User userToSave = UserMapper.mapToUser(postUserRequest);
+		String encodedPassword = encoder.encode(postUserRequest.getPassword());
+		log.info("Encoded password: {}", encodedPassword);
+		userToSave.setPassword(encodedPassword);
+		log.info("New user entity has been created: {}", userToSave);
+
+		return userToSave;
 	}
 
 }

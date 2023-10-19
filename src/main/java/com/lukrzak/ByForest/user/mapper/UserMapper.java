@@ -17,7 +17,6 @@ public interface UserMapper {
 		return User.builder()
 				.email(postUserRequest.getEmail())
 				.login(postUserRequest.getLogin())
-				.password(postUserRequest.getPassword())
 				.build();
 	}
 

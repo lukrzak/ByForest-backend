@@ -11,15 +11,15 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class UserMapperTests {
 
 	@Test
-	void testMappingFromPostUserRequestToUser(){
+	void testMappingFromPostUserRequestToUser() {
 		PostUserRequest req = new PostUserRequest("test", "t3sT", "test@email.com");
 
 		User mappedUser = UserMapper.mapToUser(req);
 
-		assertEquals(mappedUser.getLogin(), req.getLogin());
-		assertEquals(mappedUser.getEmail(), req.getEmail());
-		assertEquals(mappedUser.getPassword(), req.getPassword());
+		assertEquals(req.getLogin(), mappedUser.getLogin());
+		assertEquals(req.getEmail(), mappedUser.getEmail());
 		assertNull(mappedUser.getId());
+		assertNull(mappedUser.getPassword());
 	}
 
 }
