@@ -1,5 +1,6 @@
 package com.lukrzak.ByForest.user.service;
 
+import com.lukrzak.ByForest.exception.ViolatedConstraintException;
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
@@ -10,7 +11,7 @@ public interface UserService {
 
 	GetUserResponse findUser(long id) throws UserDoesntExistException;
 
-	User saveUser(PostUserRequest user) throws CredentialsAlreadyTakenException;
+	User saveUser(PostUserRequest user) throws CredentialsAlreadyTakenException, ViolatedConstraintException;
 
 	void deleteUser(long id);
 

@@ -1,5 +1,6 @@
 package com.lukrzak.ByForest.user.service;
 
+import com.lukrzak.ByForest.exception.ViolatedConstraintException;
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
@@ -7,6 +8,7 @@ import com.lukrzak.ByForest.exception.UserDoesntExistException;
 import com.lukrzak.ByForest.user.mapper.UserMapper;
 import com.lukrzak.ByForest.user.model.User;
 import com.lukrzak.ByForest.user.repository.UserRepository;
+import com.lukrzak.ByForest.util.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,7 +33,8 @@ public class DefaultUserService implements UserService {
 	}
 
 	@Override
-	public User saveUser(PostUserRequest user) throws CredentialsAlreadyTakenException {
+	public User saveUser(PostUserRequest user) throws CredentialsAlreadyTakenException, ViolatedConstraintException {
+		Validator.validateUserToSave(user);
 		checkIfLoginOrEmailTaken(user);
 		User userToSave = createUserEntityFromDto(user);
 		userRepository.save(userToSave);

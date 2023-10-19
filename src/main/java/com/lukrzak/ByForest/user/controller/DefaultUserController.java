@@ -1,5 +1,6 @@
 package com.lukrzak.ByForest.user.controller;
 
+import com.lukrzak.ByForest.exception.ViolatedConstraintException;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
 import com.lukrzak.ByForest.user.service.UserService;
@@ -22,7 +23,7 @@ public class DefaultUserController implements UserController {
 
 	@Override
 	@PostMapping
-	public ResponseEntity<String> saveUser(@RequestBody PostUserRequest userRequest) throws CredentialsAlreadyTakenException {
+	public ResponseEntity<String> saveUser(@RequestBody PostUserRequest userRequest) throws CredentialsAlreadyTakenException, ViolatedConstraintException {
 		userService.saveUser(userRequest);
 		return new ResponseEntity<>("User " + userRequest + " saved successfully", HttpStatus.OK);
 	}

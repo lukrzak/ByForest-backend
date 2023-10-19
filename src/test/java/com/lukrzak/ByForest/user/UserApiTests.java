@@ -55,8 +55,8 @@ public class UserApiTests {
 
 	@Test
 	void testAddingUserWithTakenCredentials() {
-		PostUserRequest userRequest = new PostUserRequest("login", "pass", "email@em.com");
-		PostUserRequest userWithTakenCredentials = new PostUserRequest("login", "ppp", "emaaaa@em.com");
+		PostUserRequest userRequest = new PostUserRequest("login", "Password!123", "email@em.com");
+		PostUserRequest userWithTakenCredentials = new PostUserRequest("login", "Password!123", "emaaaa@em.com");
 
 		assertEquals("User " + userRequest + " saved successfully", getSaveUserResponse(userRequest));
 		assertEquals("User with login: " + userWithTakenCredentials.getLogin()

@@ -1,5 +1,6 @@
 package com.lukrzak.ByForest.user;
 
+import com.lukrzak.ByForest.exception.ViolatedConstraintException;
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
@@ -28,7 +29,7 @@ import static org.mockito.Mockito.when;
 public class DefaultServiceTests {
 
 	private static DefaultUserService userService;
-	private static final User dummyUser = new User(1L, "login", "password", "email@em.com");
+	private static final User dummyUser = new User(1L, "login", "Password!123", "email@em.com");
 
 	@BeforeAll
 	static void setup() {
@@ -64,9 +65,9 @@ public class DefaultServiceTests {
 	}
 
 	@Test
-	void testSavingUser() throws CredentialsAlreadyTakenException {
-		PostUserRequest req = new PostUserRequest("new", "pass", "emmm@em.com");
-		PostUserRequest postWithTakenCredentials = new PostUserRequest(dummyUser.getLogin(), "pass", dummyUser.getEmail());
+	void testSavingUser() throws CredentialsAlreadyTakenException, ViolatedConstraintException {
+		PostUserRequest req = new PostUserRequest("log", "Password!123", "emmm@em.com");
+		PostUserRequest postWithTakenCredentials = new PostUserRequest(dummyUser.getLogin(), "Password!123", dummyUser.getEmail());
 
 		userService.saveUser(req);
 
@@ -74,8 +75,8 @@ public class DefaultServiceTests {
 	}
 
 	@Test
-	void testPasswordEncryptingOnUserCreation() throws CredentialsAlreadyTakenException {
-		PostUserRequest req = new PostUserRequest("new", "pass", "emmm@em.com");
+	void testPasswordEncryptingOnUserCreation() throws CredentialsAlreadyTakenException, ViolatedConstraintException {
+		PostUserRequest req = new PostUserRequest("log", "Password!123", "emmm@em.com");
 
 		User savedUser = userService.saveUser(req);
 		assertNotEquals(req.getPassword(), savedUser.getPassword());
