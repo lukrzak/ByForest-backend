@@ -17,6 +17,9 @@ public class Validator {
 	private final static int MIN_LOGIN_LENGTH = 3;
 
 	public static void validateUserToSave(PostUserRequest request) throws ViolatedConstraintException {
+		if (request.getLogin() == null || request.getEmail() == null || request.getPassword() == null)
+			throw new ViolatedConstraintException("Request's fields must not be null");
+		log.info("Fields are not null");
 		if (!request.getPassword().matches(PASSWORD_REGEX))
 			throw new ViolatedConstraintException("Password must contain at least 8 characters including special character");
 		log.info("Password for {} is valid", request);
