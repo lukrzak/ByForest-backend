@@ -1,14 +1,16 @@
 package com.lukrzak.ByForest.event.controller;
 
+import com.lukrzak.ByForest.event.dto.GetEventResponse;
 import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.model.Event;
+import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 
 public interface EventController {
 
-	Event findEvent(long id);
+	ResponseEntity<List<GetEventResponse>> getEventsByName(String name);
 
-	void saveEvent(PostEventRequest postEventRequest);
-
-	void deleteEvent(long id);
+	ResponseEntity<String> addEvent(PostEventRequest postEventRequest);
 
 }

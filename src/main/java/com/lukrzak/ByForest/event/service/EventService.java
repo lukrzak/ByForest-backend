@@ -1,14 +1,16 @@
 package com.lukrzak.ByForest.event.service;
 
+import com.lukrzak.ByForest.event.dto.GetEventResponse;
 import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.model.Event;
 
+import java.util.List;
+
 public interface EventService {
 
-	Event findEvent(Long id);
+	List<GetEventResponse> findAllByNameLike(String name);
 
-	void saveEvent(PostEventRequest postEventRequest);
-
-	void deleteEvent(Long id);
+	Event saveEvent(PostEventRequest postEventRequest);
 
 }
+
