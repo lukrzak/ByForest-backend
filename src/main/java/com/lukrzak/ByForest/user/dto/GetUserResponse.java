@@ -10,6 +10,7 @@ import lombok.Getter;
 public class GetUserResponse {
 
 	private String login;
+
 	private String email;
 
 	@Override

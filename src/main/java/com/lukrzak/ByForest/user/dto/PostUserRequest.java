@@ -10,7 +10,9 @@ import lombok.Getter;
 public class PostUserRequest {
 
 	private String login;
+
 	private String password;
+
 	private String email;
 
 	@Override
