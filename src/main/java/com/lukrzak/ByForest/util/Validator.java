@@ -18,9 +18,9 @@ public class Validator {
 		if (!request.getPassword().matches(PASSWORD_REGEX))
 			throw new ViolatedConstraintException("Password must contain at least 8 characters including special character");
 		if (!request.getEmail().matches(EMAIL_REGEX))
-			throw new ViolatedConstraintException("Invalid email format");
+			throw new ViolatedConstraintException("Invalid email format in " + request.getEmail());
 		if (!inBoundaries(request.getLogin().length(), MIN_LOGIN_LENGTH, MAX_LOGIN_LENGTH))
-			throw new ViolatedConstraintException("Login must be 3 to 20 characters long");
+			throw new ViolatedConstraintException("Login must be 3 to 20 characters long in " + request.getLogin());
 	}
 
 	private static boolean inBoundaries(int currentValue, int minValue, int maxValue) {
