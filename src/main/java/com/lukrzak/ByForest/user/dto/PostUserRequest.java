@@ -15,6 +15,7 @@ public class PostUserRequest {
 
 	@Override
 	public String toString(){
-		return login + ", " + email;
+		return "PostUserRequest[" + login + ", " + email + "]";
 	}
+
 }

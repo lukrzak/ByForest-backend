@@ -12,4 +12,9 @@ public class GetUserResponse {
 	private String login;
 	private String email;
 
+	@Override
+	public String toString(){
+		return "AuthenticationRequest[" + login + ", " + email + "]";
+	}
+
 }
