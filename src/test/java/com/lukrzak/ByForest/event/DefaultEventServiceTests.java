@@ -3,6 +3,7 @@ package com.lukrzak.ByForest.event;
 import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.model.Event;
 import com.lukrzak.ByForest.event.repository.EventRepository;
+import com.lukrzak.ByForest.event.repository.EventStatusRepository;
 import com.lukrzak.ByForest.event.service.DefaultEventService;
 import com.lukrzak.ByForest.exception.UserDoesntExistException;
 import com.lukrzak.ByForest.user.UserTestUtils;
@@ -29,8 +30,9 @@ public class DefaultEventServiceTests {
 	@BeforeAll
 	static void setup() {
 		EventRepository eventRepository = mock(EventRepository.class);
+		EventStatusRepository eventStatusRepository = mock(EventStatusRepository.class);
 		UserRepository userRepository = mock(UserRepository.class);
-		eventService = new DefaultEventService(eventRepository, userRepository);
+		eventService = new DefaultEventService(eventRepository, eventStatusRepository, userRepository);
 
 		when(userRepository.findByLogin(dummyUser.getLogin()))
 				.thenReturn(Optional.of(dummyUser));

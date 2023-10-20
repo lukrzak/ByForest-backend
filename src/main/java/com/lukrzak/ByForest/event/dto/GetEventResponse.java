@@ -11,6 +11,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class GetEventResponse {
 
+	private final Long id;
+
 	private final String name;
 
 	private final String place;

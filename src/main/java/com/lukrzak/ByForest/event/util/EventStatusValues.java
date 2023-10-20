@@ -1,8 +1,8 @@
 package com.lukrzak.ByForest.event.util;
 
-public enum EventResponseStatus {
+public enum EventStatusValues {
 	GOING,
 	CONSIDERING,
 	UNDEFINED,
-	NOT_GOING,
+	NOT_GOING
 }
