@@ -17,16 +17,9 @@ import java.util.Date;
 @Slf4j
 public class JwtGenerator {
 
-	private String SECRET_KEY;
-
 	private final Environment environment;
 
 	private final long JWT_EXPIRATION_TIME = 1000 * 60 * 60 * 24;
-
-	@PostConstruct
-	private void setKey() {
-		SECRET_KEY = environment.getProperty("jwt.key");
-	}
 
 	public String generateJwtToken(String subject){
 		log.info("Invoked generation of JWT for: " + subject);
@@ -40,7 +33,10 @@ public class JwtGenerator {
 	}
 
 	private Key getSigningKey() {
-		byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
+		String secret = environment.getProperty("jwt.key");
+		if (secret == null)
+			throw new NullPointerException("Secret key is null");
+		byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
 		return Keys.hmacShaKeyFor(keyBytes);
 	}
 
