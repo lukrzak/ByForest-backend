@@ -23,8 +23,9 @@ import static org.mockito.Mockito.when;
 public class DefaultControllerTests {
 
 	private static DefaultUserController userController;
-	private static final GetUserResponse dummyResponse = new GetUserResponse("login", "email@em.com");
-	private static final PostUserRequest dummyPostRequest = new PostUserRequest("login", "pass", "email@em.com");
+	private static final GetUserResponse getUserResponse = UserTestUtils.getGetUserResponse();
+	private static final PostUserRequest existingUserPostRequest = UserTestUtils.getExistingUserPostRequest();
+	private static final PostUserRequest newUserPostRequest = UserTestUtils.getNewUserPostRequest();
 
 	@BeforeAll
 	static void setup() throws UserDoesntExistException, CredentialsAlreadyTakenException, ViolatedConstraintException {
@@ -35,20 +36,19 @@ public class DefaultControllerTests {
 				.thenAnswer(inv -> {
 					Long providedId = inv.getArgument(0);
 					if (providedId.equals(1L))
-						return dummyResponse;
+						return getUserResponse;
 					throw new UserDoesntExistException("User with id: " + providedId + " does not exist");
 				});
 
 		doReturn(new User()).when(userService).saveUser(any());
-		doThrow(CredentialsAlreadyTakenException.class).when(userService).saveUser(dummyPostRequest);
-
+		doThrow(CredentialsAlreadyTakenException.class).when(userService).saveUser(existingUserPostRequest);
 		doNothing().when(userService).deleteUser(anyLong());
 	}
 
 	@Test
 	void testSavingUser() throws ViolatedConstraintException, CredentialsAlreadyTakenException {
-		userController.saveUser(new PostUserRequest("AAA", "Password!123", "email@em.com"));
-		assertThrows(CredentialsAlreadyTakenException.class, () -> userController.saveUser(dummyPostRequest));
+		userController.saveUser(newUserPostRequest);
+		assertThrows(CredentialsAlreadyTakenException.class, () -> userController.saveUser(existingUserPostRequest));
 	}
 
 }

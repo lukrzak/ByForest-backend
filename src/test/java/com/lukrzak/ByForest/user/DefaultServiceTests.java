@@ -1,6 +1,7 @@
 package com.lukrzak.ByForest.user;
 
 import com.lukrzak.ByForest.exception.ViolatedConstraintException;
+import com.lukrzak.ByForest.user.dto.AuthenticationRequest;
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
@@ -20,24 +21,30 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultServiceTests {
 
 	private static DefaultUserService userService;
-	private static final User dummyUser = new User(1L, "login", "Password!123", "email@em.com");
+	private static final User dummyUser = UserTestUtils.getDummyUser();
+	private static final PostUserRequest newUserPostRequest = UserTestUtils.getNewUserPostRequest();
+	private static final PostUserRequest existingUserPostRequest = UserTestUtils.getExistingUserPostRequest();
+	private static final AuthenticationRequest existingUserAuthenticationRequest = UserTestUtils.getExistingUserAuthenticationRequest();
+	private static final AuthenticationRequest incorrectEmailUserAuthenticationRequest = UserTestUtils.getIncorrectEmailUserAuthenticationRequest();
+	private static final AuthenticationRequest incorrectPasswordUserAuthenticationRequest = UserTestUtils.getIncorrectPasswordUserAuthenticationRequest();
 
 	@BeforeAll
 	static void setup() {
 		UserRepository userRepository = mock(UserRepository.class);
 		PasswordEncoder encoder = mock(BCryptPasswordEncoder.class);
-		JwtGenerator generator = spy(JwtGenerator.class);
+		JwtGenerator generator = mock(JwtGenerator.class);
 		userService = new DefaultUserService(userRepository, encoder, generator);
 
 		when(userRepository.findById(anyLong()))
@@ -56,6 +63,22 @@ public class DefaultServiceTests {
 						return Optional.of(dummyUser);
 					return Optional.empty();
 				});
+
+		when(userRepository.findByEmail(anyString()))
+				.thenAnswer(inv -> {
+					String providedEmail = inv.getArgument(0);
+					if (providedEmail.equals(dummyUser.getEmail()))
+						return Optional.of(dummyUser);
+					return Optional.empty();
+				});
+
+		when(encoder.matches(anyString(), anyString()))
+				.thenAnswer(inv -> {
+					String providedPassword = inv.getArgument(0);
+					return providedPassword.equals(dummyUser.getPassword());
+				});
+
+		doReturn("token").when(generator).generateJwtToken(anyString());
 	}
 
 	@Test
@@ -69,20 +92,25 @@ public class DefaultServiceTests {
 
 	@Test
 	void testSavingUser() throws CredentialsAlreadyTakenException, ViolatedConstraintException {
-		PostUserRequest req = new PostUserRequest("log", "Password!123", "emmm@em.com");
-		PostUserRequest postWithTakenCredentials = new PostUserRequest(dummyUser.getLogin(), "Password!123", dummyUser.getEmail());
+		userService.saveUser(newUserPostRequest);
 
-		userService.saveUser(req);
-
-		assertThrows(CredentialsAlreadyTakenException.class, () -> userService.saveUser(postWithTakenCredentials));
+		assertThrows(CredentialsAlreadyTakenException.class, () -> userService.saveUser(existingUserPostRequest));
 	}
 
 	@Test
 	void testPasswordEncryptingOnUserCreation() throws CredentialsAlreadyTakenException, ViolatedConstraintException {
-		PostUserRequest req = new PostUserRequest("log", "Password!123", "emmm@em.com");
+		User savedUser = userService.saveUser(newUserPostRequest);
 
-		User savedUser = userService.saveUser(req);
-		assertNotEquals(req.getPassword(), savedUser.getPassword());
+		assertNotEquals(newUserPostRequest.getPassword(), savedUser.getPassword());
+	}
+
+	@Test
+	void testUserAuthentication() throws UserDoesntExistException {
+		String token = userService.authenticateUser(existingUserAuthenticationRequest);
+
+		assertNotNull(token);
+		assertThrows(UserDoesntExistException.class, () -> userService.authenticateUser(incorrectEmailUserAuthenticationRequest));
+		assertThrows(UserDoesntExistException.class, () -> userService.authenticateUser(incorrectPasswordUserAuthenticationRequest));
 	}
 
 	@Test
@@ -91,4 +119,5 @@ public class DefaultServiceTests {
 		userService.deleteUser(1L);
 		userService.deleteUser(2L);
 	}
+
 }

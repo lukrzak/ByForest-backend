@@ -14,7 +14,10 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import static com.lukrzak.ByForest.ByForestApplication.BASE_URL;
+import java.util.List;
+
+import static com.lukrzak.ByForest.user.UserTestUtils.DATABASE_IMAGE;
+import static com.lukrzak.ByForest.user.UserTestUtils.URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
@@ -22,12 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @AutoConfigureWebTestClient
 public class UserApiTests {
 
-	private final static String DATABASE_IMAGE = "mysql:8.1.0";
-	private final static String URI = BASE_URL + "/users";
-
+	private static final PostUserRequest newUserPostRequest = UserTestUtils.getNewUserPostRequest();
 	@Autowired
 	private UserRepository userRepository;
-
 	@Autowired
 	private WebTestClient webTestClient;
 
@@ -45,23 +45,25 @@ public class UserApiTests {
 
 	@Test
 	void testAddingUser() {
-		PostUserRequest userRequest = new PostUserRequest("login", "Password123!", "email@em.com");
-		PostUserRequest otherUser = new PostUserRequest("lloogg", "Password123!", "emaaaa@em.com");
+		int AMOUNT = 3;
+		List<PostUserRequest> requests = UserTestUtils.generatePostUserRequests(AMOUNT);
 
-		assertEquals("User " + userRequest + " saved successfully", getSaveUserResponse(userRequest));
-		assertEquals("User " + otherUser + " saved successfully", getSaveUserResponse(otherUser));
-		assertEquals(2, userRepository.findAll().size());
+		for (PostUserRequest req: requests) {
+			assertEquals("User " + req + " saved successfully", getSaveUserResponse(req));
+		}
+		assertEquals(AMOUNT, userRepository.findAll().size());
 	}
 
 	@Test
 	void testAddingUserWithTakenCredentials() {
-		PostUserRequest userRequest = new PostUserRequest("login", "Password!123", "email@em.com");
-		PostUserRequest userWithTakenCredentials = new PostUserRequest("login", "Password!123", "emaaaa@em.com");
-
-		assertEquals("User " + userRequest + " saved successfully", getSaveUserResponse(userRequest));
-		assertEquals("User with login: " + userWithTakenCredentials.getLogin()
+		PostUserRequest userWithTakenCredentials = new PostUserRequest(newUserPostRequest.getLogin(), "Password!123", "emaaaa@em.com");
+		String expectedErrorMessage = "User with login: "
+				+ userWithTakenCredentials.getLogin()
 				+ " or email: " + userWithTakenCredentials.getEmail()
-				+ " already exists", getSaveUserResponse(userWithTakenCredentials));
+				+ " already exists";
+
+		assertEquals("User " + newUserPostRequest + " saved successfully", getSaveUserResponse(newUserPostRequest));
+		assertEquals(expectedErrorMessage, getSaveUserResponse(userWithTakenCredentials));
 		assertEquals(1, userRepository.findAll().size());
 	}
 
