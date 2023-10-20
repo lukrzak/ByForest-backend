@@ -2,6 +2,7 @@ package com.lukrzak.ByForest.user;
 
 import com.lukrzak.ByForest.exception.ViolatedConstraintException;
 import com.lukrzak.ByForest.user.controller.DefaultUserController;
+import com.lukrzak.ByForest.user.dto.AuthenticationRequest;
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
@@ -30,6 +31,10 @@ public class DefaultControllerTests {
 
 	private static final PostUserRequest newUserPostRequest = UserTestUtils.getNewUserPostRequest();
 
+	private static final AuthenticationRequest validAuthenticationRequest = UserTestUtils.getExistingUserAuthenticationRequest();
+
+	private static final AuthenticationRequest incorrectEmailUserAuthenticationRequest = UserTestUtils.getIncorrectEmailUserAuthenticationRequest();
+
 	@BeforeAll
 	static void setup() throws UserDoesntExistException, CredentialsAlreadyTakenException, ViolatedConstraintException {
 		UserService userService = mock(UserService.class);
@@ -45,6 +50,8 @@ public class DefaultControllerTests {
 
 		doReturn(new User()).when(userService).saveUser(any());
 		doThrow(CredentialsAlreadyTakenException.class).when(userService).saveUser(existingUserPostRequest);
+		doThrow(UserDoesntExistException.class).when(userService).authenticateUser(any());
+		doReturn("token").when(userService).authenticateUser(validAuthenticationRequest);
 		doNothing().when(userService).deleteUser(anyLong());
 	}
 
@@ -54,4 +61,9 @@ public class DefaultControllerTests {
 		assertThrows(CredentialsAlreadyTakenException.class, () -> userController.saveUser(existingUserPostRequest));
 	}
 
+	@Test
+	void testUserAuthentication() throws UserDoesntExistException {
+		userController.authenticateUser(validAuthenticationRequest);
+		assertThrows(UserDoesntExistException.class, () -> userController.authenticateUser(incorrectEmailUserAuthenticationRequest));
+	}
 }

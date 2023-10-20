@@ -38,6 +38,14 @@ public class UserTestUtils {
 				.build();
 	}
 
+	public static PostUserRequest getInvalidUserPostRequest() {
+		return PostUserRequest.builder()
+				.login("login")
+				.password("p")
+				.email("email@ema.com")
+				.build();
+	}
+
 	public static List<PostUserRequest> generatePostUserRequests(int amount) {
 		List<PostUserRequest> requests = new LinkedList<>();
 		for (int i = 0; i < amount; i++){

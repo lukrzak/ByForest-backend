@@ -1,5 +1,6 @@
 package com.lukrzak.ByForest.user;
 
+import com.lukrzak.ByForest.user.dto.AuthenticationRequest;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -19,6 +20,7 @@ import java.util.List;
 import static com.lukrzak.ByForest.user.UserTestUtils.DATABASE_IMAGE;
 import static com.lukrzak.ByForest.user.UserTestUtils.USERS_ENDPOINT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -26,6 +28,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class UserApiTests {
 
 	private static final PostUserRequest newUserPostRequest = UserTestUtils.getNewUserPostRequest();
+
+	private static final PostUserRequest existingUserPostRequest = UserTestUtils.getExistingUserPostRequest();
+
+	private static final PostUserRequest invalidPasswordUserPostRequest = UserTestUtils.getInvalidUserPostRequest();
+
+	private static final AuthenticationRequest existingUserAuthenticationRequest = UserTestUtils.getExistingUserAuthenticationRequest();
+
+	private static final AuthenticationRequest incorrectEmailAuthenticationRequest = UserTestUtils.getIncorrectEmailUserAuthenticationRequest();
+
+	private static final AuthenticationRequest incorrectPasswordAuthenticationRequest = UserTestUtils.getIncorrectPasswordUserAuthenticationRequest();
 
 	@Autowired
 	private UserRepository userRepository;
@@ -70,19 +82,33 @@ public class UserApiTests {
 	}
 
 	@Test
-	void testAddingUserWithPasswordHashing() {
-		// TODO
+	void testUserAuthentication() {
+		getSaveUserResponse(existingUserPostRequest);
+
+		assertNotNull(getAuthenticationResponse(existingUserAuthenticationRequest));
+		assertEquals("User with email: " + incorrectEmailAuthenticationRequest.getEmail() + " does not exist", getAuthenticationResponse(incorrectEmailAuthenticationRequest));
+		assertEquals("Incorrect password", getAuthenticationResponse(incorrectPasswordAuthenticationRequest));
 	}
 
 	@Test
-	void testAddingUserWithIncorrectCredentials() {
-		// TODO
+	void testSavingWithInvalidCredentials() {
+		assertEquals("Password must contain at least 8 characters including special character", getSaveUserResponse(invalidPasswordUserPostRequest));
 	}
 
 	private String getSaveUserResponse(PostUserRequest userRequest) {
 		return webTestClient.post()
 				.uri(USERS_ENDPOINT_URI)
 				.bodyValue(userRequest)
+				.exchange()
+				.expectBody(String.class)
+				.returnResult()
+				.getResponseBody();
+	}
+
+	private String getAuthenticationResponse(AuthenticationRequest request) {
+		return webTestClient.post()
+				.uri(USERS_ENDPOINT_URI + "/authenticate")
+				.bodyValue(request)
 				.exchange()
 				.expectBody(String.class)
 				.returnResult()
