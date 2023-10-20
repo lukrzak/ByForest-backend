@@ -1,6 +1,5 @@
 package com.lukrzak.ByForest.event;
 
-import com.lukrzak.ByForest.event.dto.GetEventResponse;
 import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.model.Event;
 import com.lukrzak.ByForest.event.repository.EventRepository;
@@ -12,10 +11,8 @@ import com.lukrzak.ByForest.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -24,7 +21,9 @@ import static org.mockito.Mockito.when;
 public class DefaultEventServiceTests {
 
 	private final static User dummyUser = UserTestUtils.getDummyUser();
+
 	private final static Event dummyEvent = EventTestUtils.getDummyEvent();
+
 	private static DefaultEventService eventService;
 
 	@BeforeAll

@@ -1,5 +1,6 @@
 package com.lukrzak.ByForest.event;
 
+import com.lukrzak.ByForest.event.dto.GetEventResponse;
 import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.model.Event;
 import com.lukrzak.ByForest.user.UserTestUtils;
@@ -36,6 +37,21 @@ public class EventTestUtils {
 		}
 
 		return events;
+	}
+
+	public static List<GetEventResponse> generateEventResponses(int amount) {
+		List<GetEventResponse> responses = new LinkedList<>();
+		for (int i = 0; i < amount; i++) {
+			GetEventResponse newResponse = GetEventResponse.builder()
+					.place("place" + i)
+					.creator("login" + i)
+					.name("event" + i)
+					.date(LocalDate.now())
+					.build();
+			responses.add(newResponse);
+		}
+
+		return responses;
 	}
 
 	public static PostEventRequest getPostEventRequest() {
