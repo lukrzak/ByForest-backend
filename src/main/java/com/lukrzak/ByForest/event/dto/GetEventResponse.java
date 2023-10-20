@@ -11,12 +11,12 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class GetEventResponse {
 
-	private String name;
+	private final String name;
 
-	private String place;
+	private final String place;
 
-	private LocalDate date;
+	private final LocalDate date;
 
-	private String creator;
+	private final String creator;
 
 }

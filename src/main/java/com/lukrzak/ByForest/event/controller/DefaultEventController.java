@@ -3,6 +3,7 @@ package com.lukrzak.ByForest.event.controller;
 import com.lukrzak.ByForest.event.dto.GetEventResponse;
 import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.service.EventService;
+import com.lukrzak.ByForest.exception.UserDoesntExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +26,9 @@ public class DefaultEventController implements EventController {
 	}
 
 	@Override
-	public ResponseEntity<String> addEvent(PostEventRequest postEventRequest) {
-		return null;
+	public ResponseEntity<String> addEvent(PostEventRequest postEventRequest) throws UserDoesntExistException {
+		eventService.saveEvent(postEventRequest);
+		return ResponseEntity.ok().body("Event " + postEventRequest.getName() + " has been created");
 	}
 
 }
