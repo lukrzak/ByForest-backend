@@ -17,7 +17,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.util.List;
 
 import static com.lukrzak.ByForest.user.UserTestUtils.DATABASE_IMAGE;
-import static com.lukrzak.ByForest.user.UserTestUtils.URI;
+import static com.lukrzak.ByForest.user.UserTestUtils.USERS_ENDPOINT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
@@ -26,8 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class UserApiTests {
 
 	private static final PostUserRequest newUserPostRequest = UserTestUtils.getNewUserPostRequest();
+
 	@Autowired
 	private UserRepository userRepository;
+
 	@Autowired
 	private WebTestClient webTestClient;
 
@@ -79,7 +81,7 @@ public class UserApiTests {
 
 	private String getSaveUserResponse(PostUserRequest userRequest) {
 		return webTestClient.post()
-				.uri(URI)
+				.uri(USERS_ENDPOINT_URI)
 				.bodyValue(userRequest)
 				.exchange()
 				.expectBody(String.class)

@@ -13,7 +13,9 @@ import static com.lukrzak.ByForest.ByForestApplication.BASE_URL;
 public class UserTestUtils {
 
 	public final static String DATABASE_IMAGE = "mysql:8.1.0";
-	public final static String URI = BASE_URL + "/users";
+
+	public final static String USERS_ENDPOINT_URI = BASE_URL + "/users";
+
 	private final static User dummyUser = new User(1L, "login", "Password!123", "email@em.com");
 
 	public static User getDummyUser() {

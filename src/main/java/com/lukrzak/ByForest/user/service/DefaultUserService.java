@@ -24,7 +24,9 @@ import java.util.Optional;
 public class DefaultUserService implements UserService {
 
 	private final UserRepository userRepository;
+
 	private final PasswordEncoder encoder;
+
 	private final JwtGenerator jwtGenerator;
 
 	@Override
@@ -40,20 +42,25 @@ public class DefaultUserService implements UserService {
 
 	@Override
 	public String authenticateUser(AuthenticationRequest authenticationRequest) throws UserDoesntExistException {
-		User user = userRepository.findByEmail(authenticationRequest.getEmail())
-				.orElseThrow(() -> new UserDoesntExistException("User does not exist"));
-		if (!encoder.matches(authenticationRequest.getPassword(), user.getPassword()))
+		User foundUser = userRepository.findByEmail(authenticationRequest.getEmail())
+				.orElseThrow(() -> new UserDoesntExistException("User with email: " + authenticationRequest.getEmail() + " does not exist"));
+		log.info("Found user with email {}: {}", authenticationRequest.getEmail(), foundUser);
+		if (!encoder.matches(authenticationRequest.getPassword(), foundUser.getPassword()))
 			throw new UserDoesntExistException("Incorrect password");
+		log.info("Passwords match");
 
-		return jwtGenerator.generateJwtToken(user.getEmail());
+		return jwtGenerator.generateJwtToken(foundUser.getEmail());
 	}
 
 	@Override
 	public GetUserResponse findUser(long id) throws UserDoesntExistException {
 		User foundUser = userRepository.findById(id)
 				.orElseThrow(() -> new UserDoesntExistException("User with id: " + id + " does not exist"));
-		log.info("User with id: {} has been found: {}-{}", id, foundUser.getLogin(), foundUser.getEmail());
-		return UserMapper.mapToGetUserResponse(foundUser);
+		log.info("Found user with id {}: {}", id, foundUser);
+		GetUserResponse response = UserMapper.mapToGetUserResponse(foundUser);
+		log.info("Mapped user: {}, to: {}", foundUser, response);
+
+		return response;
 	}
 
 	@Override
@@ -76,7 +83,7 @@ public class DefaultUserService implements UserService {
 		String encodedPassword = encoder.encode(postUserRequest.getPassword());
 		log.info("Encoded password: {}", encodedPassword);
 		userToSave.setPassword(encodedPassword);
-		log.info("New user entity has been created: {}", userToSave);
+		log.info("New user entity has been created: {} from: {}", userToSave, postUserRequest);
 
 		return userToSave;
 	}

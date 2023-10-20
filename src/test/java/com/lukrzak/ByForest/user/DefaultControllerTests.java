@@ -23,8 +23,11 @@ import static org.mockito.Mockito.when;
 public class DefaultControllerTests {
 
 	private static DefaultUserController userController;
+
 	private static final GetUserResponse getUserResponse = UserTestUtils.getGetUserResponse();
+
 	private static final PostUserRequest existingUserPostRequest = UserTestUtils.getExistingUserPostRequest();
+
 	private static final PostUserRequest newUserPostRequest = UserTestUtils.getNewUserPostRequest();
 
 	@BeforeAll

@@ -33,11 +33,17 @@ import static org.mockito.Mockito.when;
 public class DefaultServiceTests {
 
 	private static DefaultUserService userService;
+
 	private static final User dummyUser = UserTestUtils.getDummyUser();
+
 	private static final PostUserRequest newUserPostRequest = UserTestUtils.getNewUserPostRequest();
+
 	private static final PostUserRequest existingUserPostRequest = UserTestUtils.getExistingUserPostRequest();
+
 	private static final AuthenticationRequest existingUserAuthenticationRequest = UserTestUtils.getExistingUserAuthenticationRequest();
+
 	private static final AuthenticationRequest incorrectEmailUserAuthenticationRequest = UserTestUtils.getIncorrectEmailUserAuthenticationRequest();
+
 	private static final AuthenticationRequest incorrectPasswordUserAuthenticationRequest = UserTestUtils.getIncorrectPasswordUserAuthenticationRequest();
 
 	@BeforeAll
