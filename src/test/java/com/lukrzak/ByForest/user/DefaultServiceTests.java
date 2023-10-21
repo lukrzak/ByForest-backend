@@ -5,7 +5,7 @@ import com.lukrzak.ByForest.user.dto.AuthenticationRequest;
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
-import com.lukrzak.ByForest.exception.UserDoesntExistException;
+import com.lukrzak.ByForest.exception.UserException;
 import com.lukrzak.ByForest.user.model.User;
 import com.lukrzak.ByForest.user.repository.UserRepository;
 import com.lukrzak.ByForest.user.service.DefaultUserService;
@@ -88,12 +88,12 @@ public class DefaultServiceTests {
 	}
 
 	@Test
-	void testFindingUser() throws UserDoesntExistException {
+	void testFindingUser() throws UserException {
 		GetUserResponse response = userService.findUser(1L);
 
 		assertEquals(response.getEmail(), dummyUser.getEmail());
 		assertEquals(response.getLogin(), dummyUser.getLogin());
-		assertThrows(UserDoesntExistException.class, () -> userService.findUser(2L));
+		assertThrows(UserException.class, () -> userService.findUser(2L));
 	}
 
 	@Test
@@ -111,12 +111,12 @@ public class DefaultServiceTests {
 	}
 
 	@Test
-	void testUserAuthentication() throws UserDoesntExistException {
+	void testUserAuthentication() throws UserException {
 		String token = userService.authenticateUser(existingUserAuthenticationRequest);
 
 		assertNotNull(token);
-		assertThrows(UserDoesntExistException.class, () -> userService.authenticateUser(incorrectEmailUserAuthenticationRequest));
-		assertThrows(UserDoesntExistException.class, () -> userService.authenticateUser(incorrectPasswordUserAuthenticationRequest));
+		assertThrows(UserException.class, () -> userService.authenticateUser(incorrectEmailUserAuthenticationRequest));
+		assertThrows(UserException.class, () -> userService.authenticateUser(incorrectPasswordUserAuthenticationRequest));
 	}
 
 	@Test

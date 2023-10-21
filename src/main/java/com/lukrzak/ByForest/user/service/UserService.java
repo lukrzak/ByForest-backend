@@ -5,16 +5,16 @@ import com.lukrzak.ByForest.user.dto.AuthenticationRequest;
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
-import com.lukrzak.ByForest.exception.UserDoesntExistException;
+import com.lukrzak.ByForest.exception.UserException;
 import com.lukrzak.ByForest.user.model.User;
 
 public interface UserService {
 
 	User saveUser(PostUserRequest user) throws CredentialsAlreadyTakenException, ViolatedConstraintException;
 
-	String authenticateUser(AuthenticationRequest authenticationRequest) throws UserDoesntExistException;
+	String authenticateUser(AuthenticationRequest authenticationRequest) throws UserException;
 
-	GetUserResponse findUser(long id) throws UserDoesntExistException;
+	GetUserResponse findUser(long id) throws UserException;
 
 	void deleteUser(long id);
 

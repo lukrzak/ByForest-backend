@@ -1,6 +1,6 @@
 package com.lukrzak.ByForest.user.controller;
 
-import com.lukrzak.ByForest.exception.UserDoesntExistException;
+import com.lukrzak.ByForest.exception.UserException;
 import com.lukrzak.ByForest.exception.ViolatedConstraintException;
 import com.lukrzak.ByForest.user.dto.AuthenticationRequest;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
@@ -34,7 +34,7 @@ public class DefaultUserController implements UserController {
 
 	@Override
 	@PostMapping("/authenticate")
-	public ResponseEntity<String> authenticateUser(@RequestBody AuthenticationRequest authenticationRequest) throws UserDoesntExistException {
+	public ResponseEntity<String> authenticateUser(@RequestBody AuthenticationRequest authenticationRequest) throws UserException {
 		log.info("Received " + authenticationRequest + " - invoked authenticateUser(AuthenticationRequest) method");
 		return ResponseEntity.ok().body(userService.authenticateUser(authenticationRequest));
 	}

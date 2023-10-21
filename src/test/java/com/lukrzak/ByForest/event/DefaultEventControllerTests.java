@@ -5,7 +5,7 @@ import com.lukrzak.ByForest.event.dto.GetEventResponse;
 import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.model.Event;
 import com.lukrzak.ByForest.event.service.EventService;
-import com.lukrzak.ByForest.exception.UserDoesntExistException;
+import com.lukrzak.ByForest.exception.UserException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -31,13 +31,13 @@ public class DefaultEventControllerTests {
 	private static EventService eventService;
 
 	@BeforeAll
-	static void setup() throws UserDoesntExistException {
+	static void setup() throws UserException {
 		eventService = mock(EventService.class);
 		eventController = new DefaultEventController(eventService);
 
 		when(eventService.findAllByNameLike(eq(dummyEvent.getName())))
 				.thenReturn(EventTestUtils.generateEventResponses(5));
-		doThrow(UserDoesntExistException.class).when(eventService).saveEvent(incorrectPostEventRequest);
+		doThrow(UserException.class).when(eventService).saveEvent(incorrectPostEventRequest);
 	}
 
 	@Test
@@ -49,14 +49,14 @@ public class DefaultEventControllerTests {
 	}
 
 	@Test
-	void testSavingEvent() throws UserDoesntExistException {
+	void testSavingEvent() throws UserException {
 		PostEventRequest request = EventTestUtils.getPostEventRequest();
 
 		ResponseEntity<String> response = eventController.addEvent(request);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals("Event " + request.getName() + " has been created", response.getBody());
-		assertThrows(UserDoesntExistException.class, () -> eventController.addEvent(incorrectPostEventRequest));
+		assertThrows(UserException.class, () -> eventController.addEvent(incorrectPostEventRequest));
 	}
 
 }

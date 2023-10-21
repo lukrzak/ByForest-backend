@@ -17,8 +17,8 @@ public class ControllerAdvisor {
 		return ResponseEntity.badRequest().body(e.getMessage());
 	}
 
-	@ExceptionHandler(UserDoesntExistException.class)
-	public final ResponseEntity<String> handleUserDoesntExistException(UserDoesntExistException e) {
+	@ExceptionHandler(UserException.class)
+	public final ResponseEntity<String> handleUserDoesntExistException(UserException e) {
 		return ResponseEntity.badRequest().body(e.getMessage());
 	}
 

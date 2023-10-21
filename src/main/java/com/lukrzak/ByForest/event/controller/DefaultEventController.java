@@ -4,8 +4,8 @@ import com.lukrzak.ByForest.event.dto.GetEventResponse;
 import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.dto.PatchStatusRequest;
 import com.lukrzak.ByForest.event.service.EventService;
-import com.lukrzak.ByForest.exception.EventDoesntExistException;
-import com.lukrzak.ByForest.exception.UserDoesntExistException;
+import com.lukrzak.ByForest.exception.EventException;
+import com.lukrzak.ByForest.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,14 +36,14 @@ public class DefaultEventController implements EventController {
 
 	@Override
 	@PostMapping
-	public ResponseEntity<String> addEvent(@RequestBody PostEventRequest postEventRequest) throws UserDoesntExistException {
+	public ResponseEntity<String> addEvent(@RequestBody PostEventRequest postEventRequest) throws UserException {
 		eventService.saveEvent(postEventRequest);
 		return ResponseEntity.ok().body("Event " + postEventRequest.getName() + " has been created");
 	}
 
 	@Override
 	@PatchMapping("/update/{id}")
-	public ResponseEntity<String> changeStatus(@PathVariable Long id, @RequestBody PatchStatusRequest patchStatusRequest) throws UserDoesntExistException, EventDoesntExistException {
+	public ResponseEntity<String> changeStatus(@PathVariable Long id, @RequestBody PatchStatusRequest patchStatusRequest) throws UserException, EventException {
 		eventService.changeStatus(id, patchStatusRequest);
 		return ResponseEntity.ok().body("User " + patchStatusRequest.getLogin() + " updated status of event with id: " + id);
 	}

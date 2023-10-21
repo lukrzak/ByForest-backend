@@ -33,4 +33,8 @@ public class Event {
 	@ManyToOne
 	private User creator;
 
+	@Override
+	public String toString() {
+		return String.format("Event[%s, %s, %s]", name, place, date);
+	}
 }

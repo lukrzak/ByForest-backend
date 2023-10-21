@@ -5,7 +5,7 @@ import com.lukrzak.ByForest.user.dto.AuthenticationRequest;
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
-import com.lukrzak.ByForest.exception.UserDoesntExistException;
+import com.lukrzak.ByForest.exception.UserException;
 import com.lukrzak.ByForest.user.mapper.UserMapper;
 import com.lukrzak.ByForest.user.model.User;
 import com.lukrzak.ByForest.user.repository.UserRepository;
@@ -41,21 +41,21 @@ public class DefaultUserService implements UserService {
 	}
 
 	@Override
-	public String authenticateUser(AuthenticationRequest authenticationRequest) throws UserDoesntExistException {
+	public String authenticateUser(AuthenticationRequest authenticationRequest) throws UserException {
 		User foundUser = userRepository.findByEmail(authenticationRequest.getEmail())
-				.orElseThrow(() -> new UserDoesntExistException("User with email: " + authenticationRequest.getEmail() + " does not exist"));
+				.orElseThrow(() -> new UserException("User with email: " + authenticationRequest.getEmail() + " does not exist"));
 		log.info("Found user with email {}: {}", authenticationRequest.getEmail(), foundUser);
 		if (!encoder.matches(authenticationRequest.getPassword(), foundUser.getPassword()))
-			throw new UserDoesntExistException("Incorrect password");
+			throw new UserException("Incorrect password");
 		log.info("Passwords match");
 
 		return jwtGenerator.generateJwtToken(foundUser.getEmail());
 	}
 
 	@Override
-	public GetUserResponse findUser(long id) throws UserDoesntExistException {
+	public GetUserResponse findUser(long id) throws UserException {
 		User foundUser = userRepository.findById(id)
-				.orElseThrow(() -> new UserDoesntExistException("User with id: " + id + " does not exist"));
+				.orElseThrow(() -> new UserException("User with id: " + id + " does not exist"));
 		log.info("Found user with id {}: {}", id, foundUser);
 		GetUserResponse response = UserMapper.mapToGetUserResponse(foundUser);
 		log.info("Mapped user: {}, to: {}", foundUser, response);

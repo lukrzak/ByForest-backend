@@ -5,7 +5,7 @@ import com.lukrzak.ByForest.event.model.Event;
 import com.lukrzak.ByForest.event.repository.EventRepository;
 import com.lukrzak.ByForest.event.repository.EventStatusRepository;
 import com.lukrzak.ByForest.event.service.DefaultEventService;
-import com.lukrzak.ByForest.exception.UserDoesntExistException;
+import com.lukrzak.ByForest.exception.UserException;
 import com.lukrzak.ByForest.user.UserTestUtils;
 import com.lukrzak.ByForest.user.model.User;
 import com.lukrzak.ByForest.user.repository.UserRepository;
@@ -46,12 +46,12 @@ public class DefaultEventServiceTests {
 	}
 
 	@Test
-	void testSavingEvent() throws UserDoesntExistException {
+	void testSavingEvent() throws UserException {
 		PostEventRequest postEventRequest = EventTestUtils.getPostEventRequest();
 		PostEventRequest postEventRequestWithIncorrectLogin = EventTestUtils.getPostEventRequestWithIncorrectLogin();
 
 		eventService.saveEvent(postEventRequest);
-		assertThrows(UserDoesntExistException.class, () -> eventService.saveEvent(postEventRequestWithIncorrectLogin));
+		assertThrows(UserException.class, () -> eventService.saveEvent(postEventRequestWithIncorrectLogin));
 	}
 
 }

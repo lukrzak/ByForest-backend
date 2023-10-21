@@ -6,7 +6,7 @@ import com.lukrzak.ByForest.user.dto.AuthenticationRequest;
 import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
-import com.lukrzak.ByForest.exception.UserDoesntExistException;
+import com.lukrzak.ByForest.exception.UserException;
 import com.lukrzak.ByForest.user.model.User;
 import com.lukrzak.ByForest.user.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,7 +36,7 @@ public class DefaultControllerTests {
 	private static final AuthenticationRequest incorrectEmailUserAuthenticationRequest = UserTestUtils.getIncorrectEmailUserAuthenticationRequest();
 
 	@BeforeAll
-	static void setup() throws UserDoesntExistException, CredentialsAlreadyTakenException, ViolatedConstraintException {
+	static void setup() throws UserException, CredentialsAlreadyTakenException, ViolatedConstraintException {
 		UserService userService = mock(UserService.class);
 		userController = new DefaultUserController(userService);
 
@@ -45,12 +45,12 @@ public class DefaultControllerTests {
 					Long providedId = inv.getArgument(0);
 					if (providedId.equals(1L))
 						return getUserResponse;
-					throw new UserDoesntExistException("User with id: " + providedId + " does not exist");
+					throw new UserException("User with id: " + providedId + " does not exist");
 				});
 
 		doReturn(new User()).when(userService).saveUser(any());
 		doThrow(CredentialsAlreadyTakenException.class).when(userService).saveUser(existingUserPostRequest);
-		doThrow(UserDoesntExistException.class).when(userService).authenticateUser(any());
+		doThrow(UserException.class).when(userService).authenticateUser(any());
 		doReturn("token").when(userService).authenticateUser(validAuthenticationRequest);
 		doNothing().when(userService).deleteUser(anyLong());
 	}
@@ -62,8 +62,8 @@ public class DefaultControllerTests {
 	}
 
 	@Test
-	void testUserAuthentication() throws UserDoesntExistException {
+	void testUserAuthentication() throws UserException {
 		userController.authenticateUser(validAuthenticationRequest);
-		assertThrows(UserDoesntExistException.class, () -> userController.authenticateUser(incorrectEmailUserAuthenticationRequest));
+		assertThrows(UserException.class, () -> userController.authenticateUser(incorrectEmailUserAuthenticationRequest));
 	}
 }
