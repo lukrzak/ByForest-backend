@@ -28,13 +28,21 @@ import static org.mockito.Mockito.when;
 
 public class DefaultEventServiceTests {
 
-	private final static User dummyUser = UserTestUtils.getDummyUser();
+	private static final User correctUser = UserTestUtils.getDummyUser();
 
-	private final static Event dummyEvent = EventTestUtils.getDummyEvent();
+	private static final Event correctEvent = EventTestUtils.getCorrectEvent();
 
-	private final static EventStatus eventStatus = EventTestUtils.getEventStatus();
+	private static final EventStatus correctEventStatus = EventTestUtils.getCorrectEventStatus();
 
 	private static DefaultEventService eventService;
+
+	private final PostEventRequest correctPostEventRequest = EventTestUtils.getCorrectPostEventRequest();
+
+	private final PostEventRequest incorrectPostEventRequest = EventTestUtils.getPostEventRequestWithIncorrectLogin();
+
+	private final PatchStatusRequest correctPatchStatusRequest = EventTestUtils.getCorrectPatchStatusRequest();
+
+	private final PatchStatusRequest incorrectPatchStatusRequest = EventTestUtils.getPatchStatusRequestWithIncorrectLogin();
 
 	@BeforeAll
 	static void setup() {
@@ -46,39 +54,35 @@ public class DefaultEventServiceTests {
 		doReturn(Optional.empty()).when(userRepository).findByLogin(anyString());
 		doReturn(Optional.empty()).when(eventRepository).findById(anyLong());
 		doReturn(Optional.empty()).when(eventStatusRepository).findByEventAndUser(any(), any());
-		when(userRepository.findByLogin(dummyUser.getLogin()))
-				.thenReturn(Optional.of(dummyUser));
-		when(eventRepository.findAllByNameLike(eq(dummyEvent.getName())))
+
+		when(userRepository.findByLogin(correctUser.getLogin()))
+				.thenReturn(Optional.of(correctUser));
+		when(eventRepository.findAllByNameLike(eq(correctEvent.getName())))
 				.thenReturn(EventTestUtils.generateEvents(5));
-		when(eventRepository.findById(dummyEvent.getId()))
-				.thenReturn(Optional.of(dummyEvent));
-		when(eventStatusRepository.findByEventAndUser(dummyEvent, dummyUser))
-				.thenReturn(Optional.of(eventStatus));
+		when(eventRepository.findById(correctEvent.getId()))
+				.thenReturn(Optional.of(correctEvent));
+		when(eventStatusRepository.findByEventAndUser(correctEvent, correctUser))
+				.thenReturn(Optional.of(correctEventStatus));
 	}
 
 	@Test
 	void testFindingEventsByName() {
-		eventService.findAllByNameLike(dummyEvent.getName());
+		eventService.findAllByNameLike(correctEvent.getName());
 	}
 
 	@Test
 	void testSavingEvent() throws UserException {
-		PostEventRequest postEventRequest = EventTestUtils.getPostEventRequest();
-		PostEventRequest postEventRequestWithIncorrectLogin = EventTestUtils.getPostEventRequestWithIncorrectLogin();
+		eventService.saveEvent(correctPostEventRequest);
 
-		eventService.saveEvent(postEventRequest);
-		assertThrows(UserException.class, () -> eventService.saveEvent(postEventRequestWithIncorrectLogin));
+		assertThrows(UserException.class, () -> eventService.saveEvent(incorrectPostEventRequest));
 	}
 
 	@Test
 	void testChangingStatus() throws EventException, UserException {
-		PatchStatusRequest request = EventTestUtils.getPatchStatusRequest();
-		PatchStatusRequest incorrectPatch = EventTestUtils.getIncorrectPatchStatusRequest();
+		eventService.changeStatus(correctEvent.getId(), correctPatchStatusRequest);
 
-		eventService.changeStatus(dummyEvent.getId(), request);
-
-		assertThrows(UserException.class, () -> eventService.changeStatus(dummyEvent.getId(), incorrectPatch));
-		assertThrows(EventException.class, () -> eventService.changeStatus(2L, request));
+		assertThrows(UserException.class, () -> eventService.changeStatus(correctEvent.getId(), incorrectPatchStatusRequest));
+		assertThrows(EventException.class, () -> eventService.changeStatus(EventTestUtils.getIncorrectEventId(), correctPatchStatusRequest));
 	}
 
 }

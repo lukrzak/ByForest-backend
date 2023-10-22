@@ -23,8 +23,12 @@ public class EventTestUtils {
 			.name("event")
 			.build();
 
-	public static Event getDummyEvent() {
+	public static Event getCorrectEvent() {
 		return dummyEvent;
+	}
+
+	public static Long getIncorrectEventId() {
+		return dummyEvent.getId() + 1;
 	}
 
 	public static List<Event> generateEvents(int amount) {
@@ -57,7 +61,7 @@ public class EventTestUtils {
 		return responses;
 	}
 
-	public static PostEventRequest getPostEventRequest() {
+	public static PostEventRequest getCorrectPostEventRequest() {
 		return PostEventRequest.builder()
 				.place("place")
 				.date(LocalDate.now())
@@ -77,24 +81,24 @@ public class EventTestUtils {
 				.build();
 	}
 
-	public static PatchStatusRequest getPatchStatusRequest() {
+	public static PatchStatusRequest getCorrectPatchStatusRequest() {
 		return PatchStatusRequest.builder()
 				.login(UserTestUtils.getDummyUser().getLogin())
 				.status(EventStatusValues.GOING)
 				.build();
 	}
 
-	public static PatchStatusRequest getIncorrectPatchStatusRequest() {
+	public static PatchStatusRequest getPatchStatusRequestWithIncorrectLogin() {
 		return PatchStatusRequest.builder()
 				.login("incorrect")
 				.status(EventStatusValues.GOING)
 				.build();
 	}
 
-	public static EventStatus getEventStatus() {
+	public static EventStatus getCorrectEventStatus() {
 		return EventStatus.builder()
 				.status(EventStatusValues.UNDEFINED)
-				.event(getDummyEvent())
+				.event(getCorrectEvent())
 				.user(UserTestUtils.getDummyUser())
 				.build();
 	}

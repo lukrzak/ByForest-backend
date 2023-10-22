@@ -5,6 +5,7 @@ import com.lukrzak.ByForest.event.dto.GetEventResponse;
 import com.lukrzak.ByForest.event.dto.PatchStatusRequest;
 import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.model.Event;
+import com.lukrzak.ByForest.event.model.EventStatus;
 import com.lukrzak.ByForest.event.service.EventService;
 import com.lukrzak.ByForest.exception.EventException;
 import com.lukrzak.ByForest.exception.UserException;
@@ -17,8 +18,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -26,11 +25,17 @@ import static org.mockito.Mockito.when;
 
 public class DefaultEventControllerTests {
 
-	private final static Event dummyEvent = EventTestUtils.getDummyEvent();
+	private static final Event correctEvent = EventTestUtils.getCorrectEvent();
 
-	private final static PostEventRequest incorrectPostEventRequest = EventTestUtils.getPostEventRequestWithIncorrectLogin();
+	private static final PostEventRequest correctPostEventRequest = EventTestUtils.getCorrectPostEventRequest();
 
-	private final static PatchStatusRequest incorrectUserPatchStatusRequest = EventTestUtils.getIncorrectPatchStatusRequest();
+	private static final PatchStatusRequest correctPatchStatusRequest = EventTestUtils.getCorrectPatchStatusRequest();
+
+	private static final EventStatus changedEventStatus = EventTestUtils.getCorrectEventStatus();
+
+	private static final PostEventRequest incorrectPostEventRequest = EventTestUtils.getPostEventRequestWithIncorrectLogin();
+
+	private static final PatchStatusRequest incorrectUserPatchStatusRequest = EventTestUtils.getPatchStatusRequestWithIncorrectLogin();
 
 	private static DefaultEventController eventController;
 
@@ -41,42 +46,43 @@ public class DefaultEventControllerTests {
 		eventService = mock(EventService.class);
 		eventController = new DefaultEventController(eventService);
 
-		when(eventService.findAllByNameLike(eq(dummyEvent.getName())))
-				.thenReturn(EventTestUtils.generateEventResponses(5));
+		doThrow(UserException.class).when(eventService).changeStatus(correctEvent.getId(), incorrectUserPatchStatusRequest);
+		doThrow(EventException.class).when(eventService).changeStatus(EventTestUtils.getIncorrectEventId(), correctPatchStatusRequest);
 		doThrow(UserException.class).when(eventService).saveEvent(incorrectPostEventRequest);
-		doThrow(UserException.class).when(eventService).changeStatus(anyLong(), eq(incorrectUserPatchStatusRequest));
-		doThrow(EventException.class).when(eventService).changeStatus(eq(2L), any());
+
+		when(eventService.findAllByNameLike(eq(correctEvent.getName())))
+				.thenReturn(EventTestUtils.generateEventResponses(5));
+		when(eventService.changeStatus(correctEvent.getId(), correctPatchStatusRequest))
+				.thenReturn(changedEventStatus);
+		when(eventService.saveEvent(eq(correctPostEventRequest)))
+				.thenReturn(correctEvent);
 	}
 
 	@Test
 	void testFindingEventsByName() {
-		ResponseEntity<List<GetEventResponse>> response = eventController.getEventsByName(dummyEvent.getName());
+		ResponseEntity<List<GetEventResponse>> response = eventController.getEventsByName(correctEvent.getName());
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(eventService.findAllByNameLike(dummyEvent.getName()), response.getBody());
+		assertEquals(eventService.findAllByNameLike(correctEvent.getName()), response.getBody());
 	}
 
 	@Test
 	void testSavingEvent() throws UserException {
-		PostEventRequest request = EventTestUtils.getPostEventRequest();
-
-		ResponseEntity<String> response = eventController.addEvent(request);
+		ResponseEntity<String> response = eventController.addEvent(correctPostEventRequest);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals("Event " + request.getName() + " has been created", response.getBody());
+		assertEquals("Event " + correctPostEventRequest.getName() + " has been created", response.getBody());
 		assertThrows(UserException.class, () -> eventController.addEvent(incorrectPostEventRequest));
 	}
 
 	@Test
 	void testChangingStatus() throws EventException, UserException {
-		PatchStatusRequest patchStatusRequest = EventTestUtils.getPatchStatusRequest();
-
-		ResponseEntity<String> response = eventController.changeStatus(1L, patchStatusRequest);
+		ResponseEntity<String> response = eventController.changeStatus(1L, correctPatchStatusRequest);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals("User " + patchStatusRequest.getLogin() + " updated status of event with id: 1", response.getBody());
+		assertEquals("User " + correctPatchStatusRequest.getLogin() + " updated status of event with id: 1", response.getBody());
 		assertThrows(UserException.class, () -> eventController.changeStatus(1L, incorrectUserPatchStatusRequest));
-		assertThrows(EventException.class, () -> eventController.changeStatus(2L, patchStatusRequest));
+		assertThrows(EventException.class, () -> eventController.changeStatus(EventTestUtils.getIncorrectEventId(), correctPatchStatusRequest));
 	}
 
 }
