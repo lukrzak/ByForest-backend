@@ -13,7 +13,15 @@ import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.lukrzak.ByForest.ByForestApplication.BASE_URL;
+
 public class EventTestUtils {
+
+	public static final String DATABASE_IMAGE = "mysql:8.1.0";
+
+	public static final String EVENTS_ENDPOINT_URI = BASE_URL + "/events";
+
+	public static final String EVENT_NAME_PARAMETER = "?name=";
 
 	private static final Event dummyEvent = Event.builder()
 			.id(1L)
@@ -37,7 +45,7 @@ public class EventTestUtils {
 			Event newEvent = Event.builder()
 					.name("event" + i)
 					.date(LocalDate.now())
-					.creator(new User())
+					.creator(UserTestUtils.getCorrectUser())
 					.place("place" + i)
 					.build();
 			events.add(newEvent);

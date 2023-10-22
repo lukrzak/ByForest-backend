@@ -33,7 +33,7 @@ public class DefaultEventService implements EventService {
 
 	@Override
 	public List<GetEventResponse> findAllByNameLike(String name) {
-		List<Event> events = eventRepository.findAllByNameLike(name);
+		List<Event> events = eventRepository.findByNameLikeIgnoreCase("%" + name + "%");
 
 		return EventMapper.mapEventCollectionToGetEventResponse(events);
 	}

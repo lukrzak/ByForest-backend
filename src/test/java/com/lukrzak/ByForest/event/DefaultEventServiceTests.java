@@ -57,7 +57,7 @@ public class DefaultEventServiceTests {
 
 		when(userRepository.findByLogin(correctUser.getLogin()))
 				.thenReturn(Optional.of(correctUser));
-		when(eventRepository.findAllByNameLike(eq(correctEvent.getName())))
+		when(eventRepository.findByNameLikeIgnoreCase(eq(correctEvent.getName())))
 				.thenReturn(EventTestUtils.generateEvents(5));
 		when(eventRepository.findById(correctEvent.getId()))
 				.thenReturn(Optional.of(correctEvent));

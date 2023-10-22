@@ -14,6 +14,7 @@ public interface EventMapper {
 		List<GetEventResponse> mappedEvents = new LinkedList<>();
 		events.forEach(e -> {
 			GetEventResponse mappedEvent = GetEventResponse.builder()
+					.id(e.getId())
 					.name(e.getName())
 					.place(e.getPlace())
 					.date(e.getDate())
