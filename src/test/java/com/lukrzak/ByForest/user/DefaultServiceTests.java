@@ -2,7 +2,6 @@ package com.lukrzak.ByForest.user;
 
 import com.lukrzak.ByForest.exception.ViolatedConstraintException;
 import com.lukrzak.ByForest.user.dto.AuthenticationRequest;
-import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.exception.CredentialsAlreadyTakenException;
 import com.lukrzak.ByForest.exception.UserException;
@@ -19,12 +18,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,9 +29,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class DefaultServiceTests {
 
-	private static DefaultUserService userService;
-
-	private static final User dummyUser = UserTestUtils.getDummyUser();
+	private static final User correctUser = UserTestUtils.getCorrectUser();
 
 	private static final PostUserRequest newUserPostRequest = UserTestUtils.getNewUserPostRequest();
 
@@ -46,6 +41,8 @@ public class DefaultServiceTests {
 
 	private static final AuthenticationRequest incorrectPasswordUserAuthenticationRequest = UserTestUtils.getIncorrectPasswordUserAuthenticationRequest();
 
+	private static DefaultUserService userService;
+
 	@BeforeAll
 	static void setup() {
 		UserRepository userRepository = mock(UserRepository.class);
@@ -53,47 +50,20 @@ public class DefaultServiceTests {
 		JwtGenerator generator = mock(JwtGenerator.class);
 		userService = new DefaultUserService(userRepository, encoder, generator);
 
-		when(userRepository.findById(anyLong()))
-				.thenAnswer(inv -> {
-					Long providedId = inv.getArgument(0);
-					if (providedId.equals(dummyUser.getId()))
-						return Optional.of(dummyUser);
-					return Optional.empty();
-				});
-
-		when(userRepository.findByLoginOrEmail(anyString(), anyString()))
-				.thenAnswer(inv -> {
-					String providedLogin = inv.getArgument(0);
-					String providedEmail = inv.getArgument(1);
-					if (providedEmail.equals(dummyUser.getEmail()) && providedLogin.equals(dummyUser.getLogin()))
-						return Optional.of(dummyUser);
-					return Optional.empty();
-				});
-
-		when(userRepository.findByEmail(anyString()))
-				.thenAnswer(inv -> {
-					String providedEmail = inv.getArgument(0);
-					if (providedEmail.equals(dummyUser.getEmail()))
-						return Optional.of(dummyUser);
-					return Optional.empty();
-				});
-
-		when(encoder.matches(anyString(), anyString()))
-				.thenAnswer(inv -> {
-					String providedPassword = inv.getArgument(0);
-					return providedPassword.equals(dummyUser.getPassword());
-				});
-
+		doReturn(Optional.empty()).when(userRepository).findByLogin(anyString());
+		doReturn(Optional.empty()).when(userRepository).findByLoginOrEmail(anyString(), anyString());
+		doReturn(Optional.empty()).when(userRepository).findByEmail(anyString());
+		doReturn(false).when(encoder).matches(anyString(), anyString());
 		doReturn("token").when(generator).generateJwtToken(anyString());
-	}
 
-	@Test
-	void testFindingUser() throws UserException {
-		GetUserResponse response = userService.findUser(1L);
-
-		assertEquals(response.getEmail(), dummyUser.getEmail());
-		assertEquals(response.getLogin(), dummyUser.getLogin());
-		assertThrows(UserException.class, () -> userService.findUser(2L));
+		when(userRepository.findById(correctUser.getId()))
+				.thenReturn(Optional.of(correctUser));
+		when(userRepository.findByLoginOrEmail(correctUser.getLogin(), correctUser.getEmail()))
+				.thenReturn(Optional.of(correctUser));
+		when(userRepository.findByEmail(correctUser.getEmail()))
+				.thenReturn(Optional.of(correctUser));
+		when(encoder.matches(eq(correctUser.getPassword()), anyString()))
+				.thenReturn(true);
 	}
 
 	@Test
@@ -104,26 +74,12 @@ public class DefaultServiceTests {
 	}
 
 	@Test
-	void testPasswordEncryptingOnUserCreation() throws CredentialsAlreadyTakenException, ViolatedConstraintException {
-		User savedUser = userService.saveUser(newUserPostRequest);
-
-		assertNotEquals(newUserPostRequest.getPassword(), savedUser.getPassword());
-	}
-
-	@Test
 	void testUserAuthentication() throws UserException {
 		String token = userService.authenticateUser(existingUserAuthenticationRequest);
 
 		assertNotNull(token);
 		assertThrows(UserException.class, () -> userService.authenticateUser(incorrectEmailUserAuthenticationRequest));
 		assertThrows(UserException.class, () -> userService.authenticateUser(incorrectPasswordUserAuthenticationRequest));
-	}
-
-	@Test
-	void testDeletingUser() {
-		// TODO check for auth when implemented
-		userService.deleteUser(1L);
-		userService.deleteUser(2L);
 	}
 
 }

@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 
 public class DefaultEventServiceTests {
 
-	private static final User correctUser = UserTestUtils.getDummyUser();
+	private static final User correctUser = UserTestUtils.getCorrectUser();
 
 	private static final Event correctEvent = EventTestUtils.getCorrectEvent();
 

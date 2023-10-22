@@ -17,7 +17,7 @@ public class EventTestUtils {
 
 	private static final Event dummyEvent = Event.builder()
 			.id(1L)
-			.creator(UserTestUtils.getDummyUser())
+			.creator(UserTestUtils.getCorrectUser())
 			.date(LocalDate.now())
 			.place("place")
 			.name("event")
@@ -83,7 +83,7 @@ public class EventTestUtils {
 
 	public static PatchStatusRequest getCorrectPatchStatusRequest() {
 		return PatchStatusRequest.builder()
-				.login(UserTestUtils.getDummyUser().getLogin())
+				.login(UserTestUtils.getCorrectUser().getLogin())
 				.status(EventStatusValues.GOING)
 				.build();
 	}
@@ -99,7 +99,7 @@ public class EventTestUtils {
 		return EventStatus.builder()
 				.status(EventStatusValues.UNDEFINED)
 				.event(getCorrectEvent())
-				.user(UserTestUtils.getDummyUser())
+				.user(UserTestUtils.getCorrectUser())
 				.build();
 	}
 

@@ -14,8 +14,4 @@ public interface UserService {
 
 	String authenticateUser(AuthenticationRequest authenticationRequest) throws UserException;
 
-	GetUserResponse findUser(long id) throws UserException;
-
-	void deleteUser(long id);
-
 }

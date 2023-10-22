@@ -18,7 +18,7 @@ public class UserTestUtils {
 
 	private final static User dummyUser = new User(1L, "login", "Password!123", "email@em.com");
 
-	public static User getDummyUser() {
+	public static User getCorrectUser() {
 		return dummyUser;
 	}
 
@@ -74,13 +74,6 @@ public class UserTestUtils {
 						.email(dummyUser.getEmail())
 						.password("Incorrect!23")
 						.build();
-	}
-
-	public static GetUserResponse getGetUserResponse() {
-		return GetUserResponse.builder()
-				.email(dummyUser.getEmail())
-				.login(dummyUser.getLogin())
-				.build();
 	}
 
 }

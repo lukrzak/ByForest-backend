@@ -52,23 +52,6 @@ public class DefaultUserService implements UserService {
 		return jwtGenerator.generateJwtToken(foundUser.getEmail());
 	}
 
-	@Override
-	public GetUserResponse findUser(long id) throws UserException {
-		User foundUser = userRepository.findById(id)
-				.orElseThrow(() -> new UserException("User with id: " + id + " does not exist"));
-		log.info("Found user with id {}: {}", id, foundUser);
-		GetUserResponse response = UserMapper.mapToGetUserResponse(foundUser);
-		log.info("Mapped user: {}, to: {}", foundUser, response);
-
-		return response;
-	}
-
-	@Override
-	public void deleteUser(long id) {
-		userRepository.deleteById(id);
-		log.info("User with id: {} has been deleted", id);
-	}
-
 	private void checkIfLoginOrEmailTaken(PostUserRequest userRequest) throws CredentialsAlreadyTakenException {
 		Optional<User> user = userRepository.findByLoginOrEmail(userRequest.getLogin(), userRequest.getEmail());
 		if (user.isPresent()){
