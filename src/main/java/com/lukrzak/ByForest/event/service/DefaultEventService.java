@@ -54,7 +54,7 @@ public class DefaultEventService implements EventService {
 	}
 
 	@Override
-	public void changeStatus(Long id, PatchStatusRequest patchStatusRequest) throws UserException, EventException {
+	public EventStatus changeStatus(Long id, PatchStatusRequest patchStatusRequest) throws UserException, EventException {
 		User user = userRepository.findByLogin(patchStatusRequest.getLogin())
 				.orElseThrow(() -> new UserException("User with login " + patchStatusRequest.getLogin() + "does not exist"));
 		Event event = eventRepository.findById(id)
@@ -63,7 +63,7 @@ public class DefaultEventService implements EventService {
 				.orElseThrow(() -> new EventException("User " + user + " is not invited to event " + event));
 
 		eventStatus.setStatus(patchStatusRequest.getStatus());
-		eventStatusRepository.save(eventStatus);
+		return eventStatusRepository.save(eventStatus);
 	}
 
 	private void saveInvitedUsersDefaultStatus(List<String> logins, Event event) {

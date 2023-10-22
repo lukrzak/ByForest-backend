@@ -4,6 +4,7 @@ import com.lukrzak.ByForest.event.dto.GetEventResponse;
 import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.dto.PatchStatusRequest;
 import com.lukrzak.ByForest.event.model.Event;
+import com.lukrzak.ByForest.event.model.EventStatus;
 import com.lukrzak.ByForest.exception.EventException;
 import com.lukrzak.ByForest.exception.UserException;
 
@@ -15,7 +16,7 @@ public interface EventService {
 
 	Event saveEvent(PostEventRequest postEventRequest) throws UserException;
 
-	void changeStatus(Long id, PatchStatusRequest patchStatusRequest) throws UserException, EventException;
+	EventStatus changeStatus(Long id, PatchStatusRequest patchStatusRequest) throws UserException, EventException;
 
 }
 

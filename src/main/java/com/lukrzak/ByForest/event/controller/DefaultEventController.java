@@ -42,7 +42,7 @@ public class DefaultEventController implements EventController {
 	}
 
 	@Override
-	@PatchMapping("/update/{id}")
+	@PatchMapping("/{id}")
 	public ResponseEntity<String> changeStatus(@PathVariable Long id, @RequestBody PatchStatusRequest patchStatusRequest) throws UserException, EventException {
 		eventService.changeStatus(id, patchStatusRequest);
 		return ResponseEntity.ok().body("User " + patchStatusRequest.getLogin() + " updated status of event with id: " + id);

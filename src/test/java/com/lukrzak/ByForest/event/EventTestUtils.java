@@ -1,8 +1,11 @@
 package com.lukrzak.ByForest.event;
 
 import com.lukrzak.ByForest.event.dto.GetEventResponse;
+import com.lukrzak.ByForest.event.dto.PatchStatusRequest;
 import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.model.Event;
+import com.lukrzak.ByForest.event.model.EventStatus;
+import com.lukrzak.ByForest.event.util.EventStatusValues;
 import com.lukrzak.ByForest.user.UserTestUtils;
 import com.lukrzak.ByForest.user.model.User;
 
@@ -71,6 +74,28 @@ public class EventTestUtils {
 				.name("event")
 				.creatorLogin("invalid")
 				.invitedUsersLogins(List.of("login1", "login2"))
+				.build();
+	}
+
+	public static PatchStatusRequest getPatchStatusRequest() {
+		return PatchStatusRequest.builder()
+				.login(UserTestUtils.getDummyUser().getLogin())
+				.status(EventStatusValues.GOING)
+				.build();
+	}
+
+	public static PatchStatusRequest getIncorrectPatchStatusRequest() {
+		return PatchStatusRequest.builder()
+				.login("incorrect")
+				.status(EventStatusValues.GOING)
+				.build();
+	}
+
+	public static EventStatus getEventStatus() {
+		return EventStatus.builder()
+				.status(EventStatusValues.UNDEFINED)
+				.event(getDummyEvent())
+				.user(UserTestUtils.getDummyUser())
 				.build();
 	}
 
