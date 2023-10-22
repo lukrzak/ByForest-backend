@@ -1,7 +1,6 @@
 package com.lukrzak.ByForest.user;
 
 import com.lukrzak.ByForest.user.dto.AuthenticationRequest;
-import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.user.model.User;
 
@@ -24,10 +23,10 @@ public class UserTestUtils {
 
 	public static PostUserRequest getExistingUserPostRequest() {
 		return PostUserRequest.builder()
-						.login(dummyUser.getLogin())
-						.email(dummyUser.getEmail())
-						.password(dummyUser.getPassword())
-						.build();
+				.login(dummyUser.getLogin())
+				.email(dummyUser.getEmail())
+				.password(dummyUser.getPassword())
+				.build();
 	}
 
 	public static PostUserRequest getNewUserPostRequest() {
@@ -71,9 +70,9 @@ public class UserTestUtils {
 
 	public static AuthenticationRequest getIncorrectPasswordUserAuthenticationRequest() {
 		return AuthenticationRequest.builder()
-						.email(dummyUser.getEmail())
-						.password("Incorrect!23")
-						.build();
+				.email(dummyUser.getEmail())
+				.password("Incorrect!23")
+				.build();
 	}
 
 }

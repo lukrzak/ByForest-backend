@@ -58,4 +58,5 @@ public class DefaultControllerTests {
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertThrows(UserException.class, () -> userController.authenticateUser(incorrectEmailUserAuthenticationRequest));
 	}
+
 }

@@ -40,4 +40,5 @@ public class EventMapperTests {
 		assertEquals(request.getDate(), mappedEvent.getDate());
 		assertEquals(user, mappedEvent.getCreator());
 	}
+
 }

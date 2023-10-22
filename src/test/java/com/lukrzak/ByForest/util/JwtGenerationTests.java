@@ -25,4 +25,5 @@ public class JwtGenerationTests {
 	void testTokenGeneration() {
 		assertNotNull(generator.generateJwtToken("subject"));
 	}
+
 }
