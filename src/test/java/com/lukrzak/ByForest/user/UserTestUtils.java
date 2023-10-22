@@ -1,7 +1,6 @@
 package com.lukrzak.ByForest.user;
 
 import com.lukrzak.ByForest.user.dto.AuthenticationRequest;
-import com.lukrzak.ByForest.user.dto.GetUserResponse;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
 import com.lukrzak.ByForest.user.model.User;
 
