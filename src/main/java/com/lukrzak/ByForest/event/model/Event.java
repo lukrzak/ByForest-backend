@@ -39,4 +39,5 @@ public class Event {
 	public String toString() {
 		return String.format("Event[%s, %s, %s]", name, place, date);
 	}
+	
 }

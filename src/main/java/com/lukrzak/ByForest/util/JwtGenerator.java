@@ -2,7 +2,6 @@ package com.lukrzak.ByForest.util;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -21,7 +20,7 @@ public class JwtGenerator {
 
 	private final long JWT_EXPIRATION_TIME = 1000 * 60 * 60 * 24;
 
-	public String generateJwtToken(String subject){
+	public String generateJwtToken(String subject) {
 		log.info("Invoked generation of JWT for: " + subject);
 		return Jwts.builder()
 				.issuer("ByForest")

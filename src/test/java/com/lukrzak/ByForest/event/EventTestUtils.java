@@ -7,7 +7,6 @@ import com.lukrzak.ByForest.event.model.Event;
 import com.lukrzak.ByForest.event.model.EventStatus;
 import com.lukrzak.ByForest.event.util.EventStatusValues;
 import com.lukrzak.ByForest.user.UserTestUtils;
-import com.lukrzak.ByForest.user.model.User;
 
 import java.time.LocalDate;
 import java.util.LinkedList;
