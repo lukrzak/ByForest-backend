@@ -3,6 +3,8 @@ package com.lukrzak.ByForest.event.model;
 import com.lukrzak.ByForest.event.util.EventStatusValues;
 import com.lukrzak.ByForest.user.model.User;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,6 +29,7 @@ public class EventStatus {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
+	@Enumerated(EnumType.STRING)
 	private EventStatusValues status;
 
 	@ManyToOne

@@ -36,7 +36,7 @@ public class EventTestUtils {
 	}
 
 	public static Long getIncorrectEventId() {
-		return dummyEvent.getId() + 1;
+		return 9999L;
 	}
 
 	public static List<Event> generateEvents(int amount) {

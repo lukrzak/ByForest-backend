@@ -48,6 +48,7 @@ public class DefaultEventService implements EventService {
 		eventRepository.save(mappedEvent);
 		log.info("Saved {}", mappedEvent);
 
+		saveCreatorStatus(user, mappedEvent);
 		saveInvitedUsersDefaultStatus(postEventRequest.getInvitedUsersLogins(), mappedEvent);
 
 		return mappedEvent;
@@ -83,6 +84,16 @@ public class DefaultEventService implements EventService {
 			eventStatusRepository.save(eventStatus);
 			log.info("Added UNDEFINED status for user: {}, in event: {}", u, event);
 		});
+	}
+
+	private void saveCreatorStatus(User creator, Event event) {
+		EventStatus eventStatus = EventStatus.builder()
+				.event(event)
+				.status(EventStatusValues.GOING)
+				.user(creator)
+				.build();
+
+		eventStatusRepository.save(eventStatus);
 	}
 
 }

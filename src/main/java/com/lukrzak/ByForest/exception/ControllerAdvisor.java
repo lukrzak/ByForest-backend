@@ -18,7 +18,12 @@ public class ControllerAdvisor {
 	}
 
 	@ExceptionHandler(UserException.class)
-	public final ResponseEntity<String> handleUserDoesntExistException(UserException e) {
+	public final ResponseEntity<String> handleUserException(UserException e) {
+		return ResponseEntity.badRequest().body(e.getMessage());
+	}
+
+	@ExceptionHandler(EventException.class)
+	public final ResponseEntity<String> handleEventException(EventException e) {
 		return ResponseEntity.badRequest().body(e.getMessage());
 	}
 

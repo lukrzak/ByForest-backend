@@ -1,8 +1,12 @@
 package com.lukrzak.ByForest.event;
 
 import com.lukrzak.ByForest.event.dto.GetEventResponse;
+import com.lukrzak.ByForest.event.dto.PatchStatusRequest;
+import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.model.Event;
 import com.lukrzak.ByForest.event.repository.EventRepository;
+import com.lukrzak.ByForest.event.repository.EventStatusRepository;
+import com.lukrzak.ByForest.event.util.EventStatusValues;
 import com.lukrzak.ByForest.user.UserTestUtils;
 import com.lukrzak.ByForest.user.model.User;
 import com.lukrzak.ByForest.user.repository.UserRepository;
@@ -36,6 +40,9 @@ public class EventApiTests {
 	private EventRepository eventRepository;
 
 	@Autowired
+	private EventStatusRepository eventStatusRepository;
+
+	@Autowired
 	private UserRepository userRepository;
 
 	@Autowired
@@ -50,6 +57,7 @@ public class EventApiTests {
 
 	@AfterEach
 	void clean() {
+		eventStatusRepository.deleteAll();
 		eventRepository.deleteAll();
 		userRepository.deleteAll();
 	}
@@ -82,6 +90,61 @@ public class EventApiTests {
 		assertEquals(otherEvent.getCreator().getLogin(), resultOfDifferentParameter.get(0).getCreator());
 	}
 
+	@Test
+	void testAddingNewEvent() {
+		PostEventRequest postEventRequest = EventTestUtils.getCorrectPostEventRequest();
+		PostEventRequest incorrectPostEventRequest = EventTestUtils.getPostEventRequestWithIncorrectLogin();
+		userRepository.save(UserTestUtils.getCorrectUser());
+		userRepository.save(User.builder()
+				.login("login1")
+				.email("example@em.com")
+				.password("Password1@3")
+				.build()
+		);
+
+		String responseMessage = getPostEventResponse(postEventRequest);
+		String errorResponseMessage = getPostEventResponse(incorrectPostEventRequest);
+
+		assertEquals("Event " + postEventRequest.getName() + " has been created", responseMessage);
+		// Two users should have eventStatus record in database
+		assertEquals(2, eventStatusRepository.findAll().size());
+		assertEquals("User with login " + incorrectPostEventRequest.getCreatorLogin() + "does not exist", errorResponseMessage);
+	}
+
+	@Test
+	void testChangingStatus() {
+		long otherEventId = 2;
+		PatchStatusRequest patchStatusRequest = EventTestUtils.getCorrectPatchStatusRequest();
+		PatchStatusRequest incorrectLoginPatchStatusRequest = EventTestUtils.getPatchStatusRequestWithIncorrectLogin();
+		User user = UserTestUtils.getCorrectUser();
+		Event otherEventWithCorrectUser = Event.builder()
+				.id(otherEventId)
+				.name("name")
+				.place("place")
+				.date(LocalDate.now())
+				.creator(user)
+				.build();
+		PatchStatusRequest patchStatusRequestForOtherEvent = PatchStatusRequest.builder()
+				.status(EventStatusValues.GOING)
+				.login(user.getLogin())
+				.build();
+		userRepository.save(user);
+		eventRepository.save(EventTestUtils.getCorrectEvent());
+		eventRepository.save(otherEventWithCorrectUser);
+		eventStatusRepository.save(EventTestUtils.getCorrectEventStatus());
+
+		String responseMessage = getPatchStatusEvent(patchStatusRequest, EventTestUtils.getCorrectEvent().getId());
+		String incorrectLoginPatchStatusResponse = getPatchStatusEvent(incorrectLoginPatchStatusRequest, EventTestUtils.getCorrectEvent().getId());
+		String incorrectIdPatchStatusResponse = getPatchStatusEvent(patchStatusRequest, EventTestUtils.getIncorrectEventId());
+		String patchStatusResponseWithOtherEvent = getPatchStatusEvent(patchStatusRequestForOtherEvent, otherEventId);
+
+		assertEquals("User " + patchStatusRequest.getLogin() + " updated status of event with id: " + EventTestUtils.getCorrectEvent().getId(), responseMessage);
+		assertEquals("User with login " + incorrectLoginPatchStatusRequest.getLogin() + "does not exist", incorrectLoginPatchStatusResponse);
+		assertEquals("Event with id " + EventTestUtils.getIncorrectEventId() + " does not exist", incorrectIdPatchStatusResponse);
+		assertEquals("User " + user + " is not invited to event " + otherEventWithCorrectUser, patchStatusResponseWithOtherEvent);
+		assertEquals(patchStatusRequest.getStatus(), eventStatusRepository.findByEventAndUser(EventTestUtils.getCorrectEvent(), user).get().getStatus());
+	}
+
 	private List<GetEventResponse> getFoundEventsByNameResult(String eventName) {
 		return webTestClient.get()
 				.uri(EVENTS_ENDPOINT_URI + EVENT_NAME_PARAMETER + eventName)
@@ -89,6 +152,26 @@ public class EventApiTests {
 				.expectStatus()
 				.isOk()
 				.expectBodyList(GetEventResponse.class)
+				.returnResult()
+				.getResponseBody();
+	}
+
+	private String getPostEventResponse(PostEventRequest body) {
+		return webTestClient.post()
+				.uri(EVENTS_ENDPOINT_URI)
+				.bodyValue(body)
+				.exchange()
+				.expectBody(String.class)
+				.returnResult()
+				.getResponseBody();
+	}
+
+	private String getPatchStatusEvent(PatchStatusRequest body, long id) {
+		return webTestClient.patch()
+				.uri(EVENTS_ENDPOINT_URI + "/" + id)
+				.bodyValue(body)
+				.exchange()
+				.expectBody(String.class)
 				.returnResult()
 				.getResponseBody();
 	}
