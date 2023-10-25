@@ -4,10 +4,10 @@ import com.lukrzak.ByForest.event.dto.GetEventResponse;
 import com.lukrzak.ByForest.event.dto.PostEventRequest;
 import com.lukrzak.ByForest.event.mapper.EventMapper;
 import com.lukrzak.ByForest.event.model.Event;
-import com.lukrzak.ByForest.user.UserTestUtils;
 import com.lukrzak.ByForest.user.model.User;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,7 +17,7 @@ public class EventMapperTests {
 	@Test
 	void testMappingCollectionToGetEventResponses() {
 		int amount = 3;
-		List<Event> eventsToMap = EventTestUtils.generateEvents(amount);
+		List<Event> eventsToMap = EventTestUtils.generateEvents(amount, new User());
 
 		List<GetEventResponse> responses = EventMapper.mapEventCollectionToGetEventResponse(eventsToMap);
 
@@ -30,8 +30,18 @@ public class EventMapperTests {
 
 	@Test
 	void testMappingToEvent() {
-		PostEventRequest request = EventTestUtils.getCorrectPostEventRequest();
-		User user = UserTestUtils.getCorrectUser();
+		PostEventRequest request = PostEventRequest.builder()
+				.place("place")
+				.invitedUsersLogins(List.of("login1", "login2"))
+				.name("event")
+				.creatorLogin("login")
+				.date(LocalDate.now())
+				.build();
+		User user = User.builder()
+				.login("login")
+				.password("Password!123")
+				.email("email@em.com")
+				.build();
 
 		Event mappedEvent = EventMapper.mapToEvent(request, user);
 

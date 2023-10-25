@@ -41,7 +41,7 @@ public class DefaultEventService implements EventService {
 	@Override
 	public Event saveEvent(PostEventRequest postEventRequest) throws UserException {
 		User user = userRepository.findByLogin(postEventRequest.getCreatorLogin())
-				.orElseThrow(() -> new UserException("User with login " + postEventRequest.getCreatorLogin() + "does not exist"));
+				.orElseThrow(() -> new UserException("User with login " + postEventRequest.getCreatorLogin() + " does not exist"));
 		log.info("Found user {}", user);
 		Event mappedEvent = EventMapper.mapToEvent(postEventRequest, user);
 		log.info("Mapped from {} to {}", postEventRequest, eventRepository);

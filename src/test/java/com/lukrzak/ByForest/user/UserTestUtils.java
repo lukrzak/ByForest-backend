@@ -1,8 +1,6 @@
 package com.lukrzak.ByForest.user;
 
-import com.lukrzak.ByForest.user.dto.AuthenticationRequest;
 import com.lukrzak.ByForest.user.dto.PostUserRequest;
-import com.lukrzak.ByForest.user.model.User;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,36 +13,6 @@ public class UserTestUtils {
 
 	public final static String USERS_ENDPOINT_URI = BASE_URL + "/users";
 
-	private final static User dummyUser = new User(1L, "login", "Password!123", "email@em.com");
-
-	public static User getCorrectUser() {
-		return dummyUser;
-	}
-
-	public static PostUserRequest getExistingUserPostRequest() {
-		return PostUserRequest.builder()
-				.login(dummyUser.getLogin())
-				.email(dummyUser.getEmail())
-				.password(dummyUser.getPassword())
-				.build();
-	}
-
-	public static PostUserRequest getNewUserPostRequest() {
-		return PostUserRequest.builder()
-				.login("newLogin")
-				.password("Password!123")
-				.email("ema@em.com")
-				.build();
-	}
-
-	public static PostUserRequest getInvalidUserPostRequest() {
-		return PostUserRequest.builder()
-				.login("login")
-				.password("p")
-				.email("email@ema.com")
-				.build();
-	}
-
 	public static List<PostUserRequest> generatePostUserRequests(int amount) {
 		List<PostUserRequest> requests = new LinkedList<>();
 		for (int i = 0; i < amount; i++){
@@ -52,27 +20,6 @@ public class UserTestUtils {
 		}
 
 		return requests;
-	}
-
-	public static AuthenticationRequest getExistingUserAuthenticationRequest() {
-		return AuthenticationRequest.builder()
-				.email(dummyUser.getEmail())
-				.password(dummyUser.getPassword())
-				.build();
-	}
-
-	public static AuthenticationRequest getIncorrectEmailUserAuthenticationRequest() {
-		return AuthenticationRequest.builder()
-				.email("incorrect@email.com")
-				.password(dummyUser.getPassword())
-				.build();
-	}
-
-	public static AuthenticationRequest getIncorrectPasswordUserAuthenticationRequest() {
-		return AuthenticationRequest.builder()
-				.email(dummyUser.getEmail())
-				.password("Incorrect!23")
-				.build();
 	}
 
 }

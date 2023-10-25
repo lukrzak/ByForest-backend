@@ -9,7 +9,6 @@ import com.lukrzak.ByForest.user.model.User;
 import com.lukrzak.ByForest.user.repository.UserRepository;
 import com.lukrzak.ByForest.user.service.DefaultUserService;
 import com.lukrzak.ByForest.util.JwtGenerator;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,66 +19,79 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultServiceTests {
 
-	private static final User correctUser = UserTestUtils.getCorrectUser();
+	private final PostUserRequest postUserRequest = PostUserRequest.builder()
+			.login("login")
+			.email("email@em.com")
+			.password("Password!123")
+			.build();
 
-	private static final PostUserRequest newUserPostRequest = UserTestUtils.getNewUserPostRequest();
+	private final AuthenticationRequest authenticationRequest = AuthenticationRequest.builder()
+			.email("email@em.com")
+			.password("Password!123")
+			.build();
 
-	private static final PostUserRequest existingUserPostRequest = UserTestUtils.getExistingUserPostRequest();
+	private final UserRepository userRepository = mock(UserRepository.class);
 
-	private static final AuthenticationRequest existingUserAuthenticationRequest = UserTestUtils.getExistingUserAuthenticationRequest();
+	private final PasswordEncoder encoder = mock(BCryptPasswordEncoder.class);
 
-	private static final AuthenticationRequest incorrectEmailUserAuthenticationRequest = UserTestUtils.getIncorrectEmailUserAuthenticationRequest();
+	private final JwtGenerator generator = mock(JwtGenerator.class);
 
-	private static final AuthenticationRequest incorrectPasswordUserAuthenticationRequest = UserTestUtils.getIncorrectPasswordUserAuthenticationRequest();
-
-	private static DefaultUserService userService;
-
-	@BeforeAll
-	static void setup() {
-		UserRepository userRepository = mock(UserRepository.class);
-		PasswordEncoder encoder = mock(BCryptPasswordEncoder.class);
-		JwtGenerator generator = mock(JwtGenerator.class);
-		userService = new DefaultUserService(userRepository, encoder, generator);
-
-		doReturn(Optional.empty()).when(userRepository).findByLogin(anyString());
-		doReturn(Optional.empty()).when(userRepository).findByLoginOrEmail(anyString(), anyString());
-		doReturn(Optional.empty()).when(userRepository).findByEmail(anyString());
-		doReturn(false).when(encoder).matches(anyString(), anyString());
-		doReturn("token").when(generator).generateJwtToken(anyString());
-
-		when(userRepository.findById(correctUser.getId()))
-				.thenReturn(Optional.of(correctUser));
-		when(userRepository.findByLoginOrEmail(correctUser.getLogin(), correctUser.getEmail()))
-				.thenReturn(Optional.of(correctUser));
-		when(userRepository.findByEmail(correctUser.getEmail()))
-				.thenReturn(Optional.of(correctUser));
-		when(encoder.matches(eq(correctUser.getPassword()), anyString()))
-				.thenReturn(true);
-	}
+	private final DefaultUserService userService = new DefaultUserService(userRepository, encoder, generator);
 
 	@Test
 	void testSavingUser() throws CredentialsAlreadyTakenException, ViolatedConstraintException {
-		userService.saveUser(newUserPostRequest);
+		when(userRepository.save(any()))
+				.thenReturn(new User());
 
-		assertThrows(CredentialsAlreadyTakenException.class, () -> userService.saveUser(existingUserPostRequest));
+		userService.saveUser(postUserRequest);
+	}
+
+	@Test
+	void testSavingUserWithTakenLogin() {
+		when(userRepository.findByLoginOrEmail(anyString(), anyString()))
+				.thenReturn(Optional.of(new User()));
+
+		assertThrows(CredentialsAlreadyTakenException.class, () -> userService.saveUser(postUserRequest));
 	}
 
 	@Test
 	void testUserAuthentication() throws UserException {
-		String token = userService.authenticateUser(existingUserAuthenticationRequest);
+		when(userRepository.findByEmail(anyString()))
+				.thenReturn(Optional.of(new User()));
+		when(encoder.matches(anyString(), any()))
+				.thenReturn(true);
+		when(generator.generateJwtToken(any()))
+				.thenReturn("token");
+
+		String token = userService.authenticateUser(authenticationRequest);
 
 		assertNotNull(token);
-		assertThrows(UserException.class, () -> userService.authenticateUser(incorrectEmailUserAuthenticationRequest));
-		assertThrows(UserException.class, () -> userService.authenticateUser(incorrectPasswordUserAuthenticationRequest));
+	}
+
+	@Test
+	void testUserAuthenticationWithIncorrectEmail() {
+		when(userRepository.findByEmail(anyString()))
+				.thenReturn(Optional.empty());
+
+		assertThrows(UserException.class, () -> userService.authenticateUser(authenticationRequest));
+	}
+
+	@Test
+	void testUserAuthenticationWithIncorrectPassword() {
+		when(userRepository.findByEmail(anyString()))
+				.thenReturn(Optional.of(new User()));
+		when(encoder.matches(anyString(), anyString()))
+				.thenReturn(false);
+
+		assertThrows(UserException.class, () -> userService.authenticateUser(authenticationRequest));
 	}
 
 }
