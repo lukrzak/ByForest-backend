@@ -29,14 +29,14 @@ public class DefaultUserController implements UserController {
 	public ResponseEntity<String> saveUser(@RequestBody PostUserRequest userRequest) throws CredentialsAlreadyTakenException, ViolatedConstraintException {
 		log.info("Received " + userRequest + " - invoked saveUser(PostUserRequest) method");
 		userService.saveUser(userRequest);
-		return ResponseEntity.ok().body("User " + userRequest + " saved successfully");
+		return ResponseEntity.ok("User " + userRequest + " saved successfully");
 	}
 
 	@Override
 	@PostMapping("/authenticate")
 	public ResponseEntity<String> authenticateUser(@RequestBody AuthenticationRequest authenticationRequest) throws UserException {
 		log.info("Received " + authenticationRequest + " - invoked authenticateUser(AuthenticationRequest) method");
-		return ResponseEntity.ok().body(userService.authenticateUser(authenticationRequest));
+		return ResponseEntity.ok(userService.authenticateUser(authenticationRequest));
 	}
 
 }

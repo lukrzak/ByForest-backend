@@ -31,21 +31,21 @@ public class DefaultEventController implements EventController {
 	@Override
 	@GetMapping
 	public ResponseEntity<List<GetEventResponse>> getEventsByName(@RequestParam("name") String name) {
-		return ResponseEntity.ok().body(eventService.findAllByNameLike(name));
+		return ResponseEntity.ok(eventService.findAllByNameLike(name));
 	}
 
 	@Override
 	@PostMapping
 	public ResponseEntity<String> addEvent(@RequestBody PostEventRequest postEventRequest) throws UserException {
 		eventService.saveEvent(postEventRequest);
-		return ResponseEntity.ok().body("Event " + postEventRequest.getName() + " has been created");
+		return ResponseEntity.ok("Event " + postEventRequest.getName() + " has been created");
 	}
 
 	@Override
 	@PatchMapping("/{id}")
 	public ResponseEntity<String> changeStatus(@PathVariable Long id, @RequestBody PatchStatusRequest patchStatusRequest) throws UserException, EventException {
 		eventService.changeStatus(id, patchStatusRequest);
-		return ResponseEntity.ok().body("User " + patchStatusRequest.getLogin() + " updated status of event with id: " + id);
+		return ResponseEntity.ok("User " + patchStatusRequest.getLogin() + " updated status of event with id: " + id);
 	}
 
 }
